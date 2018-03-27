@@ -23,7 +23,6 @@ public class MCUInfoActivity extends AppCompatActivity implements View.OnClickLi
         findViewById(R.id.btn_voltage).setOnClickListener(this);
         findViewById(R.id.btn_gpio_radar).setOnClickListener(this);
         findViewById(R.id.btn_gpio_mileage).setOnClickListener(this);
-        findViewById(R.id.btn_gpio_5).setOnClickListener(this);
         findViewById(R.id.btn_acc_status).setOnClickListener(this);
         tvResult = findViewById(R.id.tv_result);
         initBind();
@@ -80,8 +79,6 @@ public class MCUInfoActivity extends AppCompatActivity implements View.OnClickLi
                 break;
             case R.id.btn_gpio_mileage:
                 sendCommand(Command.Send.Gpio().get(8));
-                break;
-            case R.id.btn_gpio_5:
                 break;
             case R.id.btn_acc_status:
                 sendCommand(Command.Send.SearchAccStatus());
