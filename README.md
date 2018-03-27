@@ -1,4 +1,4 @@
-# E9631 SDK document
+# [E9631 SDK document](https://github.com/h4de5ing/E9631Demo)
 
 - English
 - 中文
@@ -28,9 +28,7 @@ protected void onCreate(Bundle savedInstanceState) {
           mService.getData(new CommunicationService.IProcessData() {
               @Override
               public void process(byte[] bytes, DataType dataType) {
-                  switch (dataType) {
-                      //detail received data
-                  }
+                    handle(bytes,dataType);//handle data
               }
           });
       } catch (Exception e) {
@@ -69,20 +67,20 @@ protected void onDestroy() {
 ```
 Command.Send.SearchAccStatus();// search MCU current acc status
 
- Command.Send.SearchChannel();//search MCU current channel
- Command.Send.Channel1();//setting MCU channel 1
- Command.Send.Channel2();//setting MCU channel 2
+Command.Send.SearchChannel();//search MCU current channel
+Command.Send.Channel1();//setting MCU channel 1
+Command.Send.Channel2();//setting MCU channel 2
 
- Command.Send.SearchMode(); //search MCU support protocol
- Command.Send.ModeJ1939();//setting MCU J1939 protocol
- Command.Send.ModeOBD(); //setting MCU OBDII protocol
- Command.Send.ModeCan(); //setting MCU can protocol
+Command.Send.SearchMode(); //search MCU support protocol
+Command.Send.ModeJ1939();//setting MCU J1939 protocol
+Command.Send.ModeOBD(); //setting MCU OBDII protocol
+Command.Send.ModeCan(); //setting MCU can protocol
 
- Command.Send.Switch500K(); //setting MCU 500K
- Command.Send.Switch250K(); //setting MCU 250K
+Command.Send.Switch500K(); //setting MCU 500K
+Command.Send.Switch250K(); //setting MCU 250K
 
- Command.Send.Version(); //get MCU firmware version
- Command.Send.Voltage(); //get car voltage
+Command.Send.Version(); //get MCU firmware version
+Command.Send.Voltage(); //get car voltage
 ```
 
 ### handle received data
@@ -123,8 +121,6 @@ private void handle(byte[] bytes, DataType dataType) {
             break;
         case TChannel:
             updateText("current channel " + bytes[0]);
-            break;
-        case TAccStatus://Deprecated
             break;
         case TUnknow://undefined data type,maybe error data
             break;
@@ -187,4 +183,5 @@ protected void onDestroy() {
 
 # Issues
 [issues](https://github.com/h4de5ing/E9631Demo/issues)
+
 [email](moxi1992@gmail.com)

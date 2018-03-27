@@ -57,6 +57,14 @@ public class J1939Activity extends AppCompatActivity implements View.OnClickList
                 public void process(byte[] bytes, DataType dataType) {
                     Log.e(TAG, dataType.name() + " " + DataUtils.saveHex2String(bytes));
                     switch (dataType) {
+                        case TAccOn:
+                            break;
+                        case TAccOff:
+                            break;
+                        case TMcuVersion:
+                            break;
+                        case TMcuVoltage:
+                            break;
                         case TCan250:
                             updateText("can 250K set success");
                             break;
@@ -69,9 +77,19 @@ public class J1939Activity extends AppCompatActivity implements View.OnClickList
                         case TDataMode:
                             updateText("current mode " + DataUtils.getDataMode(bytes[0]));
                             break;
+                        case TDataCan:
+                            break;
+                        case TDataOBD:
+                            break;
                         case TDataJ1939:
                             updateText("we got j1939 data:" + DataUtils.saveHex2String(bytes));
                             handleJ1939(bytes);
+                            break;
+                        case TUnknow:
+                            break;
+                        case TGPIO:
+                            break;
+                        case TAccStatus:
                             break;
                     }
                 }

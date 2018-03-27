@@ -46,11 +46,23 @@ public class CanActivity extends AppCompatActivity implements View.OnClickListen
                 public void process(byte[] bytes, DataType dataType) {
                     Log.e(TAG, dataType.name() + " " + DataUtils.saveHex2String(bytes));
                     switch (dataType) {
+                        case TAccOn:
+                            break;
+                        case TAccOff:
+                            break;
+                        case TMcuVersion:
+                            break;
+                        case TMcuVoltage:
+                            break;
                         case TCan250:
                             updateText("can 250K set success");
                             break;
                         case TCan500:
                             updateText("can 500K set success");
+                            break;
+                        case TDataOBD:
+                            break;
+                        case TDataJ1939:
                             break;
                         case TChannel:
                             updateText("current channel " + bytes[0]);
@@ -60,6 +72,12 @@ public class CanActivity extends AppCompatActivity implements View.OnClickListen
                             break;
                         case TDataCan:
                             updateText("we got can data:" + DataUtils.saveHex2String(bytes));
+                            break;
+                        case TUnknow:
+                            break;
+                        case TGPIO:
+                            break;
+                        case TAccStatus:
                             break;
                     }
                 }

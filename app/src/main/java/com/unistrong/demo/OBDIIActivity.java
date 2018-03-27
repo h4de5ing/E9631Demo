@@ -66,6 +66,14 @@ public class OBDIIActivity extends AppCompatActivity implements View.OnClickList
                 public void process(byte[] bytes, DataType dataType) {
                     Log.e(TAG, dataType.name() + " " + DataUtils.saveHex2String(bytes));
                     switch (dataType) {
+                        case TAccOn:
+                            break;
+                        case TAccOff:
+                            break;
+                        case TMcuVersion:
+                            break;
+                        case TMcuVoltage:
+                            break;
                         case TCan250:
                             updateText("can 250K set success");
                             break;
@@ -78,9 +86,19 @@ public class OBDIIActivity extends AppCompatActivity implements View.OnClickList
                         case TDataMode:
                             updateText("current mode " + DataUtils.getDataMode(bytes[0]));
                             break;
+                        case TDataCan:
+                            break;
                         case TDataOBD:
                             updateText("we got obd data:" + DataUtils.saveHex2String(bytes));
                             handleOBD(bytes);
+                            break;
+                        case TDataJ1939:
+                            break;
+                        case TUnknow:
+                            break;
+                        case TGPIO:
+                            break;
+                        case TAccStatus:
                             break;
                     }
                 }
