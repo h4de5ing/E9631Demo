@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.unistrong.demo.MCUInfoActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_version"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Version" />
+
+        <Button
+            android:id="@+id/btn_voltage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Voltage" />
+
+        <Button
+            android:id="@+id/btn_gpio_radar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="GPIO_Radar" />
+
+        <Button
+            android:id="@+id/btn_gpio_mileage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="GPIO_Mileage" />
+
+        <Button
+            android:id="@+id/btn_gpio_5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="GPIO5" />
+        <Button
+            android:id="@+id/btn_acc_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ACCStatus" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_result"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</LinearLayout>
