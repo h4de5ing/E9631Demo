@@ -181,7 +181,8 @@ protected void onDestroy() {
 }
 ```
 
+# [preview](Demo.md)
 # Issues
 [issues](https://github.com/h4de5ing/E9631Demo/issues)
 
-[email](moxi1992@gmail.com)
+email:moxi1992@gmail.com
