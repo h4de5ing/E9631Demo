@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">E9631SDKDemo</string>
+    <string name="title_activity_all">AllFunction</string>
+    <string name="action_settings">All</string>
 </resources>

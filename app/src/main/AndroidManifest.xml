@@ -2,13 +2,22 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.unistrong.demo">
 
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.RECORD_VIDEO" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.camera.autofocus" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="com.unistrong.demo.MainActivity">
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -16,26 +25,30 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.unistrong.demo.CanActivity"
+            android:name=".CanActivity"
             android:label="CAN"
             android:screenOrientation="landscape" />
         <activity
-            android:name="com.unistrong.demo.OBDIIActivity"
+            android:name=".OBDIIActivity"
             android:label="OBDII"
             android:screenOrientation="landscape" />
         <activity
-            android:name="com.unistrong.demo.J1939Activity"
+            android:name=".J1939Activity"
             android:label="J1939"
             android:screenOrientation="landscape" />
         <activity
-            android:name="com.unistrong.demo.MCUInfoActivity"
+            android:name=".MCUInfoActivity"
             android:label="McuInfo"
             android:screenOrientation="landscape" />
         <activity
-            android:name="com.unistrong.demo.UartActivity"
+            android:name=".UartActivity"
             android:label="Uart"
             android:screenOrientation="landscape"
             android:windowSoftInputMode="adjustNothing" />
+        <activity
+            android:name=".AllActivity"
+            android:label="@string/title_activity_all"
+            android:screenOrientation="landscape" />
     </application>
 
 </manifest>

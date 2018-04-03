@@ -116,7 +116,7 @@ private void handle(byte[] bytes, DataType dataType) {
 
 ## Method description
 
-###CommunicationService Communication with MCU
+### CommunicationService Communication with MCU
 
 ```
 getInstance();//get a communication instance
@@ -218,7 +218,7 @@ protected void onDestroy() {
 
 ## Method description
 
-###VanManager manager all uart
+### VanManager manager all uart
 ```
 rs232
 openUart4();//return true,when serial port /dev/ttyS4 open success
