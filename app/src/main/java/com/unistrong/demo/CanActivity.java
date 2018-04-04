@@ -1,7 +1,6 @@
 package com.unistrong.demo;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -11,7 +10,7 @@ import com.unistrong.e9631sdk.Command;
 import com.unistrong.e9631sdk.CommunicationService;
 import com.unistrong.e9631sdk.DataType;
 
-public class CanActivity extends AppCompatActivity implements View.OnClickListener {
+public class CanActivity extends BaseActivity implements View.OnClickListener {
 
     private static final String TAG = "unistrong";
     private CommunicationService mService;
@@ -23,8 +22,8 @@ public class CanActivity extends AppCompatActivity implements View.OnClickListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_can);
-        etId = findViewById(R.id.et_id);
-        etData = findViewById(R.id.et_data);
+        etId = (EditText) findViewById(R.id.et_id);
+        etData = (EditText) findViewById(R.id.et_data);
         findViewById(R.id.btn_search_channel).setOnClickListener(this);
         findViewById(R.id.btn_set_channel1).setOnClickListener(this);
         findViewById(R.id.btn_set_channel2).setOnClickListener(this);
@@ -32,7 +31,7 @@ public class CanActivity extends AppCompatActivity implements View.OnClickListen
         findViewById(R.id.btn_set_can_mode).setOnClickListener(this);
         findViewById(R.id.btn_set_baud).setOnClickListener(this);
         findViewById(R.id.btn_send_data).setOnClickListener(this);
-        mTv = findViewById(R.id.tv_result);
+        mTv = (TextView) findViewById(R.id.tv_result);
         initBind();
     }
 

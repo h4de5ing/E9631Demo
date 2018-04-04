@@ -2,7 +2,6 @@ package com.unistrong.demo;
 
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -31,7 +30,7 @@ import com.unistrong.e9631sdk.DataType;
  * 7.发送支持的PID指令
  * 8.解析PID值
  */
-public class OBDIIActivity extends AppCompatActivity implements View.OnClickListener {
+public class OBDIIActivity extends BaseActivity implements View.OnClickListener {
     private static final String TAG = "unistrong";
     private CommunicationService mService;
     private TextView mTv;
@@ -52,7 +51,7 @@ public class OBDIIActivity extends AppCompatActivity implements View.OnClickList
         findViewById(R.id.btn_send_data_start).setOnClickListener(this);
         findViewById(R.id.btn_send_data_pidlist).setOnClickListener(this);
         findViewById(R.id.btn_send_data_pid).setOnClickListener(this);
-        mTv = findViewById(R.id.tv_result);
+        mTv = (TextView) findViewById(R.id.tv_result);
         initBind();
     }
 

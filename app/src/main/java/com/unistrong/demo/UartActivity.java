@@ -1,7 +1,6 @@
 package com.unistrong.demo;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
 import android.view.View;
@@ -11,7 +10,7 @@ import android.widget.TextView;
 import com.unistrong.uartsdk.ProcessData;
 import com.unistrong.uartsdk.VanManager;
 
-public class UartActivity extends AppCompatActivity implements View.OnClickListener {
+public class UartActivity extends BaseActivity implements View.OnClickListener {
     private EditText etSend;
     private VanManager vanManager;
     private String text;
@@ -21,8 +20,8 @@ public class UartActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_uart);
-        etSend = findViewById(R.id.et_send);
-        tvResult = findViewById(R.id.tv_result);
+        etSend = (EditText) findViewById(R.id.et_send);
+        tvResult = (TextView) findViewById(R.id.tv_result);
         tvResult.setMovementMethod(new ScrollingMovementMethod());
         findViewById(R.id.btn_4).setOnClickListener(this);
         findViewById(R.id.btn_6).setOnClickListener(this);

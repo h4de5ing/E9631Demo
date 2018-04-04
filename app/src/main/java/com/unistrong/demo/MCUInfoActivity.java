@@ -1,7 +1,6 @@
 package com.unistrong.demo;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -10,7 +9,7 @@ import com.unistrong.e9631sdk.Command;
 import com.unistrong.e9631sdk.CommunicationService;
 import com.unistrong.e9631sdk.DataType;
 
-public class MCUInfoActivity extends AppCompatActivity implements View.OnClickListener {
+public class MCUInfoActivity extends BaseActivity implements View.OnClickListener {
 
     private TextView tvResult;
     private CommunicationService mService;
@@ -24,7 +23,7 @@ public class MCUInfoActivity extends AppCompatActivity implements View.OnClickLi
         findViewById(R.id.btn_gpio_radar).setOnClickListener(this);
         findViewById(R.id.btn_gpio_mileage).setOnClickListener(this);
         findViewById(R.id.btn_acc_status).setOnClickListener(this);
-        tvResult = findViewById(R.id.tv_result);
+        tvResult = (TextView) findViewById(R.id.tv_result);
         initBind();
     }
 

@@ -1,7 +1,6 @@
 package com.unistrong.demo;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -24,10 +23,10 @@ import com.unistrong.e9631sdk.DataType;
  * 3.设置can设备的通信波特率
  * 4.发送对于的J1939指令
  * 5.解析对应值
- *
+ * <p>
  * 更多关于J1939 协议的说明请阅读J1939相关文档
  */
-public class J1939Activity extends AppCompatActivity implements View.OnClickListener {
+public class J1939Activity extends BaseActivity implements View.OnClickListener {
     private static final String TAG = "unistrong";
     private CommunicationService mService;
     private TextView mTv;
@@ -43,7 +42,7 @@ public class J1939Activity extends AppCompatActivity implements View.OnClickList
         findViewById(R.id.btn_set_j1939_mode).setOnClickListener(this);
         findViewById(R.id.btn_set_baud).setOnClickListener(this);
         findViewById(R.id.btn_send_data).setOnClickListener(this);
-        mTv = findViewById(R.id.tv_result);
+        mTv = (TextView) findViewById(R.id.tv_result);
         initBind();
     }
 
