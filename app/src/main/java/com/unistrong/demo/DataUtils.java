@@ -15,6 +15,34 @@ public class DataUtils {
         return sb.toString();
     }
 
+    public static String byte2String(byte data) {
+        StringBuilder sb = new StringBuilder();
+        final char[] HEX = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+                'A', 'B', 'C', 'D', 'E', 'F'};
+        int value = data & 0xff;
+        sb.append(HEX[value / 16]).append(HEX[value % 16]).append(" ");
+        return sb.toString().trim();
+    }
+    public static byte string2byte(String byteString) {
+        byte b = 0;
+        if (byteString.length() == 2) {
+            b = (byte) (Integer.valueOf(byteString.substring(0, 2), 16) & 0xff);
+        }
+        return b;
+    }
+    public static byte[] cutByteArray(byte[] data, int start, int stop) {
+        byte[] newData = null;
+        if (data != null && data.length > 0 && stop <= data.length && stop - start > 0) {
+            newData = new byte[stop - start];
+            System.arraycopy(data, start, newData, 0, stop - start);
+        }
+        return newData;
+    }
+
+    public static int byte2int(byte b) {
+        return b & 0xff;
+    }
+
     public static String getDataMode(byte mode) {
         String modeTip;
         switch (mode) {

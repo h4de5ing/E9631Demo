@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_dark"
+    android:paddingTop="10dp">
+
+    <RelativeLayout
+        android:id="@+id/rl_dash0"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:orientation="horizontal">
+
+        <com.unistrong.demo.dashboard.DashboardView1
+            android:id="@+id/dash1"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
+            android:layout_alignParentLeft="true" />
+
+        <com.unistrong.demo.dashboard.DashboardView2
+            android:id="@+id/dash2"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
+            android:layout_alignParentRight="true" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/rl_dash1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="100dp"
+        android:layout_marginRight="100dp"
+        android:layout_marginTop="150dp">
+
+        <com.unistrong.demo.dashboard.DashboardView3
+            android:id="@+id/dash3"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
+            android:layout_alignParentLeft="true" />
+
+        <com.unistrong.demo.dashboard.DashboardView4
+            android:id="@+id/dash4"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
+            android:layout_alignParentRight="true" />
+    </RelativeLayout>
+
+
+    <TextView
+        android:id="@+id/tv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textColor="@color/color_light"
+        android:textSize="20dp"
+        android:visibility="gone"
+        tools:text="温度 " />
+
+    <ImageView
+        android:id="@+id/iv_engine"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_below="@+id/tv"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:src="@drawable/engine_normal" />
+</RelativeLayout>

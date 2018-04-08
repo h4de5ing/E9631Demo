@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion 23
@@ -27,4 +28,8 @@ dependencies {
     implementation files('libs/e9631_can_sdk_v1.0.jar')
     implementation files('libs/uartsdk_v1.0.jar')
     implementation 'com.android.support:design:23.0.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+}
+repositories {
+    mavenCentral()
 }

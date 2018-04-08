@@ -1,32 +1,33 @@
 package com.unistrong.demo;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.pm.PackageManager;
+import android.content.Intent;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
-import android.location.GpsStatus;
-import android.location.LocationManager;
+import android.media.AudioManager;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.PhoneStateListener;
 import android.telephony.SignalStrength;
 import android.telephony.TelephonyManager;
 import android.text.method.ScrollingMovementMethod;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.TextureView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Chronometer;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.unistrong.demo.dashboard.DashboardActivity;
+import com.unistrong.demo.gps.GPSActivity;
 import com.unistrong.e9631sdk.Command;
 import com.unistrong.e9631sdk.CommunicationService;
 import com.unistrong.e9631sdk.DataType;
@@ -62,7 +63,6 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
     private Chronometer tvRecordingTime7;
     private boolean isRecording6 = false;
     private boolean isRecording7 = false;
-    private TextView tvGPS;
     private TextView tvMCUInfo;
     private TextView tvCanInfo;
     private TextView tvUartInfo;
@@ -75,7 +75,6 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_all);
-        tvGPS = (TextView) findViewById(R.id.tv_gps);
         tvMCUInfo = (TextView) findViewById(R.id.tv_mcu_info);
         tvCanInfo = (TextView) findViewById(R.id.tv_can_info);
         tvUartInfo = (TextView) findViewById(R.id.tv_uart_info);
@@ -89,7 +88,11 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
         btnTakePicture7 = (Button) findViewById(R.id.btn_take_picture7);
         btnRecord7 = (Button) findViewById(R.id.btn_record7);
         tvRecordingTime7 = (Chronometer) findViewById(R.id.tv_recording_time7);
-
+        video6.setOnClickListener(this);
+        findViewById(R.id.btn_gps).setOnClickListener(this);
+        findViewById(R.id.btn_dashboard).setOnClickListener(this);
+        findViewById(R.id.btn_volume_plug).setOnClickListener(this);
+        findViewById(R.id.btn_volume_sub).setOnClickListener(this);
         findViewById(R.id.btn_4).setOnClickListener(this);
         findViewById(R.id.btn_6).setOnClickListener(this);
         findViewById(R.id.btn_7).setOnClickListener(this);
@@ -106,9 +109,25 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
         initBind();
         //btnOBDStart.performClick();
         initMcuTimer();
-        initGPS();
         initGSM();
+        initVolumes();
         updateMCUText();
+    }
+
+    private AudioManager mAudioManager;
+    private int mMaxVolume = 0;
+    private int mCurrentVolume = 0;
+
+    private void initVolumes() {
+        mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        if (mAudioManager != null) {
+            mMaxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+            mCurrentVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+        }
+    }
+
+    private void updateVolumes() {
+        Log.i(TAG, "Current:" + mCurrentVolume);
     }
 
     private Timer mMcuTimer;
@@ -127,8 +146,6 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
                     }
                 } else {//ac charger not plugged
                     mAccStatus = false;
-                    //mVersion = "NULL not";
-                    //mVoltage = "NULL not";
                     isSend = false;
                     updateMCUText();
                 }
@@ -250,7 +267,6 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
         super.onResume();
         initCamera();
         initTextureView();
-        registerLisenter();
     }
 
     @Override
@@ -261,14 +277,16 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
                 tvRecordingTime6.stop();
                 tvRecordingTime6.setVisibility(View.GONE);
                 isRecording6 = false;
-                btnRecord6.setText("record");
+                //btnRecord6.setText("record");
+                btnRecord6.setBackgroundResource(R.drawable.ic_play_arrow_black_24dp);
                 stopRecording6();
             }
             if (isRecording7) {
                 tvRecordingTime7.stop();
                 tvRecordingTime7.setVisibility(View.GONE);
                 isRecording7 = false;
-                btnRecord7.setText("record");
+                //btnRecord7.setText("record");
+                btnRecord7.setBackgroundResource(R.drawable.ic_play_arrow_black_24dp);
                 stopRecording7();
             }
         } catch (Exception e) {
@@ -276,7 +294,6 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
         }
         stopPreview();
         //closeCamera();
-        unRegisterListener();
     }
 
     private void initCamera() {
@@ -408,7 +425,7 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
 
     private CommunicationService mService;
     private boolean isStart = false;
-    private byte ECUType = (byte) 0xDF;
+    //public byte ECUType = (byte) 0xDF;
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler() {
         @Override
@@ -441,6 +458,9 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
     }
 
     private byte[] start11 = new byte[]{0x01, 0x07, (byte) 0xDF, 0x00, 0x00, 0x02, 0x01, 0x00};//ISO15756 500K 11bit
+    long mLastTime = 0;
+    long mCurTime = 0;
+    private boolean isFullScreen = false;
 
     @Override
     public void onClick(View v) {
@@ -453,7 +473,7 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
                     mHandler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            if (ECUType == (byte) 0xDF) {
+                            if (App.Companion.getAECUType() == (byte) 0xDF) {
                                 updateOBDText("can 1 connect failed");
                             }
                             isStart = false;
@@ -469,7 +489,7 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
                     mHandler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            if (ECUType == (byte) 0xDF) {
+                            if (App.Companion.getAECUType() == (byte) 0xDF) {
                                 updateOBDText("can 2 connect failed");
                             }
                             isStart = false;
@@ -485,6 +505,21 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
             case R.id.btn_6:
                 if (vanManager != null && vanManager.isOpenUart4()) {
                     vanManager.sendData2Uart6("ttyS6".getBytes());
+                }
+                break;
+            case R.id.video6:
+                mLastTime = mCurTime;
+                mCurTime = System.currentTimeMillis();
+                if (mCurTime - mLastTime < 300) {//双击事件
+                    mCurTime = 0;
+                    mLastTime = 0;
+                    Log.i(TAG, "双击事件");
+                    if (!isFullScreen) {
+                        fullScale();
+                    } else {
+                        smallScale();
+                    }
+                    isFullScreen = !isFullScreen;
                 }
                 break;
             case R.id.btn_7:
@@ -504,7 +539,46 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
             case R.id.btn_record7:
                 record7();
                 break;
+            case R.id.btn_volume_plug:
+                if (mAudioManager != null) {
+                    mCurrentVolume++;
+                    if (mCurrentVolume > mMaxVolume) {
+                        mCurrentVolume = mMaxVolume;
+                    }
+                    mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, mCurrentVolume, 0);
+                    updateVolumes();
+                }
+                break;
+            case R.id.btn_volume_sub:
+                if (mAudioManager != null) {
+                    mCurrentVolume--;
+                    if (mCurrentVolume <= 0) {
+                        mCurrentVolume = 0;
+                    }
+                    mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, mCurrentVolume, 0);
+                    updateVolumes();
+                }
+                break;
+            case R.id.btn_gps:
+                startActivity(new Intent(AllActivity.this, GPSActivity.class));
+                break;
+            case R.id.btn_dashboard:
+                startActivity(new Intent(AllActivity.this, DashboardActivity.class));
+                break;
         }
+    }
+
+    private void fullScale() {
+        DisplayMetrics metrics = getResources().getDisplayMetrics();
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(metrics.widthPixels, metrics.heightPixels);
+        video6.setLayoutParams(params);
+    }
+
+    private void smallScale() {
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(250, 250);
+        params.topMargin = 25;
+        params.leftMargin = 285;
+        video6.setLayoutParams(params);
     }
 
     private boolean mAccStatus = false;
@@ -628,7 +702,7 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
     private void handleOBD(byte[] bytes) {
         if (isStart) {
             updateOBDText("connect success");
-            ECUType = (byte) (bytes[3] - (byte) 0x08);
+            App.Companion.setAECUType((byte) (bytes[3] - (byte) 0x08));
             initTimer();
         } else {
             //00 00 07 E8 03 41 0D EA
@@ -668,73 +742,9 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
             @Override
             public void run() {
                 byte pid = 0x0D;//0x0D  Vehicle speed
-                sendOBDData(new byte[]{0x01, 0x07, ECUType, 0x00, 0x00, 0x02, 0x01, pid});
+                sendOBDData(new byte[]{0x01, 0x07, App.Companion.getAECUType(), 0x00, 0x00, 0x02, 0x01, pid});
             }
         }, 5000, 1000);
-    }
-
-    LocationManager mLM;
-
-    private void initGPS() {
-        mLM = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-    }
-
-    // 注册GPS 监听事件
-    private void registerLisenter() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(this, "没有GPS权限", Toast.LENGTH_LONG).show();
-            return;
-        }
-        //mLM.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 0, mLL);
-        //mLM.addGpsStatusListener(mGL);
-        mLM.addNmeaListener(mNL);
-    }
-
-    // 撤销
-    private void unRegisterListener() {
-        //mLM.removeUpdates(mLL);
-        //mLM.removeGpsStatusListener(mGL);
-        mLM.removeNmeaListener(mNL);
-    }
-
-    private GpsStatus.NmeaListener mNL = new GpsStatus.NmeaListener() {
-        @Override
-        public void onNmeaReceived(long arg0, String nmea) {
-            //updateGPSText("nmea:" + nmea);
-
-        }
-    };
-    private GpsStatus.Listener mGL = new GpsStatus.Listener() {
-        @Override
-        public void onGpsStatusChanged(int event) {
-            @SuppressLint("MissingPermission") GpsStatus gs = mLM.getGpsStatus(null);
-
-            switch (event) {
-                case GpsStatus.GPS_EVENT_FIRST_FIX://第一次定位
-
-                    break;
-                case GpsStatus.GPS_EVENT_SATELLITE_STATUS://卫星状态改变
-                    break;
-            }
-        }
-    };
-
-    private void updateGPSText(final String string) {
-        if (tvGPS != null) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (tvGPS != null) {
-                        tvGPS.append(string + "\n");
-                        int offset = tvGPS.getLineCount() * tvGPS.getLineHeight() - tvGPS.getHeight();
-                        if (offset >= 5000) {
-                            tvGPS.setText("");
-                        }
-                        tvGPS.scrollTo(0, offset > 0 ? offset : 0);
-                    }
-                }
-            });
-        }
     }
 
     private void takePicture6() {
@@ -792,7 +802,8 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
             tvRecordingTime6.stop();
             tvRecordingTime6.setVisibility(View.GONE);
             isRecording6 = false;
-            btnRecord6.setText("record");
+            //btnRecord6.setText("record");
+            btnRecord6.setBackgroundResource(R.drawable.ic_play_arrow_black_24dp);
             stopRecording6();
         } else {
             if (startRecording6()) {
@@ -800,12 +811,14 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
                 tvRecordingTime6.setBase(SystemClock.elapsedRealtime());
                 tvRecordingTime6.start();
                 isRecording6 = true;
-                btnRecord6.setText("stop");
+                //btnRecord6.setText("stop");
+                btnRecord6.setBackgroundResource(R.drawable.ic_stop_black_24dp);
             } else {
                 tvRecordingTime6.stop();
                 tvRecordingTime6.setVisibility(View.GONE);
                 isRecording6 = false;
-                btnRecord6.setText("record");
+                //btnRecord6.setText("record");
+                btnRecord6.setBackgroundResource(R.drawable.ic_play_arrow_black_24dp);
             }
         }
     }
@@ -815,7 +828,8 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
             tvRecordingTime7.stop();
             tvRecordingTime7.setVisibility(View.GONE);
             isRecording7 = false;
-            btnRecord7.setText("record");
+            //btnRecord7.setText("record");
+            btnRecord7.setBackgroundResource(R.drawable.ic_play_arrow_black_24dp);
             stopRecording7();
         } else {
             if (startRecording7()) {
@@ -823,12 +837,14 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
                 tvRecordingTime7.setBase(SystemClock.elapsedRealtime());
                 tvRecordingTime7.start();
                 isRecording7 = true;
-                btnRecord7.setText("stop");
+                //btnRecord7.setText("stop");
+                btnRecord7.setBackgroundResource(R.drawable.ic_stop_black_24dp);
             } else {
                 tvRecordingTime7.stop();
                 tvRecordingTime7.setVisibility(View.GONE);
                 isRecording7 = false;
-                btnRecord7.setText("record");
+                //btnRecord7.setText("record");
+                btnRecord7.setBackgroundResource(R.drawable.ic_play_arrow_black_24dp);
             }
         }
     }
@@ -955,14 +971,16 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
             if (isRecording6) {
                 tvRecordingTime6.setVisibility(View.GONE);
                 isRecording6 = false;
-                btnRecord6.setText("record");
+                //btnRecord6.setText("record");
+                btnRecord6.setBackgroundResource(R.drawable.ic_play_arrow_black_24dp);
                 tvRecordingTime6.stop();
                 stopRecording6();
             }
             if (isRecording7) {
                 tvRecordingTime7.setVisibility(View.GONE);
                 isRecording7 = false;
-                btnRecord7.setText("record");
+                //btnRecord7.setText("record");
+                btnRecord7.setBackgroundResource(R.drawable.ic_play_arrow_black_24dp);
                 tvRecordingTime7.stop();
                 stopRecording7();
             }

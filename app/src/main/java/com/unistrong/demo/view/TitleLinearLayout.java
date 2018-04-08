@@ -46,7 +46,6 @@ public class TitleLinearLayout extends LinearLayout {
     private int mBottom = 0;
     private int mLeft = 0;
     private int mRight = 0;
-    private int mTextLeftPadding = 0;
     private float mTextSize = 20;
 
     @Override
@@ -65,7 +64,6 @@ public class TitleLinearLayout extends LinearLayout {
         canvas.drawColor(Color.WHITE);
         canvas.drawRect(mLeft, mTop + 10, mRight, mBottom, mRectPaint);
         if (!TextUtils.isEmpty(mTitleText)) {
-            mTextLeftPadding = (int) mTextSize;
             mTitlePaint.setTextSize(mTextSize);
             mTitlePaint.setColor(Color.WHITE);
             canvas.drawRect(mLeft, mTop, mTitleText.length() * mTextSize, mTextSize, mTitlePaint);

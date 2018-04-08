@@ -2,4 +2,11 @@
     <string name="app_name">E9631SDKDemo</string>
     <string name="title_activity_all">AllFunction</string>
     <string name="action_settings">All</string>
+    <string name="in_view">visible:</string>
+    <string name="in_use">invisible</string>
+    <string name="activity_gps">GPS</string>
+    <string name="gps_in_view_use">GPS：</string>
+    <string name="bd_in_view_use">other：</string>
+    <string name="timetofirstfix">TTFF:</string>
+    <string name="menu_settings">settings</string>
 </resources>
