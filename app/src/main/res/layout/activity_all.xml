@@ -26,6 +26,7 @@
                 <com.unistrong.demo.view.TitleLinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:background="@drawable/circle"
                     android:orientation="vertical"
                     app:tipText="MCUInfo">
 
@@ -35,7 +36,7 @@
                         android:layout_height="match_parent"
                         android:layout_marginLeft="5dp"
                         android:gravity="center_vertical"
-                        android:textSize="25dp"
+                        android:textSize="20dp"
                         tools:text="mcuinfo" />
                 </com.unistrong.demo.view.TitleLinearLayout>
             </LinearLayout>
@@ -50,6 +51,7 @@
                 <com.unistrong.demo.view.TitleLinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:background="@drawable/circle"
                     android:orientation="horizontal"
                     android:paddingTop="20dp"
                     app:tipText="2 CVBS">
@@ -67,20 +69,25 @@
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentBottom="true"
+                            android:layout_centerVertical="true"
                             android:gravity="center">
 
                             <Button
                                 android:id="@+id/btn_take_picture6"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="capture" />
+                                android:background="@drawable/circle"
+                                android:text="capture"
+                                android:textColor="@android:color/white" />
 
                             <Button
                                 android:id="@+id/btn_record6"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="record" />
+                                android:layout_marginLeft="5dp"
+                                android:background="@drawable/circle"
+                                android:text="record"
+                                android:textColor="@android:color/white" />
                         </LinearLayout>
 
                         <Chronometer
@@ -109,20 +116,25 @@
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentBottom="true"
+                            android:layout_centerVertical="true"
                             android:gravity="center">
 
                             <Button
                                 android:id="@+id/btn_take_picture7"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="capture" />
+                                android:background="@drawable/circle"
+                                android:text="capture"
+                                android:textColor="@android:color/white" />
 
                             <Button
                                 android:id="@+id/btn_record7"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="record" />
+                                android:layout_marginLeft="5dp"
+                                android:background="@drawable/circle"
+                                android:text="record"
+                                android:textColor="@android:color/white" />
                         </LinearLayout>
 
                         <Chronometer
@@ -159,6 +171,7 @@
                 <com.unistrong.demo.view.TitleLinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:background="@drawable/circle"
                     android:orientation="horizontal"
                     android:paddingTop="20dp"
                     app:tipText="GSM">
@@ -183,6 +196,7 @@
                             android:paddingLeft="10dp"
                             android:paddingRight="10dp"
                             android:paddingTop="10dp"
+                            android:textSize="20dp"
                             tools:text="GSM" />
                     </LinearLayout>
                 </com.unistrong.demo.view.TitleLinearLayout>
@@ -198,6 +212,7 @@
                 <com.unistrong.demo.view.TitleLinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:background="@drawable/circle"
                     android:orientation="vertical"
                     android:paddingTop="20dp"
                     app:tipText="CAN">
@@ -238,6 +253,7 @@
                 <com.unistrong.demo.view.TitleLinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:background="@drawable/circle"
                     android:orientation="vertical"
                     android:paddingTop="20dp"
                     app:tipText="UART">
