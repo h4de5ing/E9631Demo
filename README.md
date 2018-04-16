@@ -174,12 +174,15 @@ Command.Send.Voltage(); //get car voltage
 
 ### Add the dependency
 
-add file libs/uartsdk_v1.0.jar
-add file jniLibs/armeabi/libVanUart.so
+Maximum support baud rate is 115200:
+supoport:2400 4800 9600 19200 57600 115200
+
+uart sdk source in module uartsdk
+
 
 ```
 dependencies {
-      implementation files('libs/uartsdk_v1.0.jar')
+     implementation project(':uartsdk')
 }
 ```
 
@@ -190,7 +193,7 @@ dependencies {
 protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
       vanManager = new VanManager();
-      boolean uart4opend = vanManager.openUart4();
+      boolean uart4opend = vanManager.openUart4(115200);
       vanManager.uartData4(new ProcessData() {
           @Override
           public void process(byte[] bytes, int len) {
@@ -221,17 +224,17 @@ protected void onDestroy() {
 ### VanManager manager all uart
 ```
 rs232
-openUart4();//return true,when serial port /dev/ttyS4 open success
+openUart4(115200);//return true,when serial port /dev/ttyS4 open success
 sendData2Uart4(data);//send data to serial port /dev/ttyS4
 closeUart4();//close serial port /dev/ttyS4
 
-openUart6();//return true,when serial port /dev/ttyS6 open success
+openUart6(115200);//return true,when serial port /dev/ttyS6 open success
 sendData2Uart6(data);//send data to serial port /dev/ttyS6
 closeUart6();//close serial port /dev/ttyS6
 
 
 rs485
-openUart7();//return true,when serial port /dev/ttyS7 open success
+openUart7(115200);//return true,when serial port /dev/ttyS7 open success
 sendData2Uart7(data);//send data to serial port /dev/ttyS7
 closeUart7();//close serial port /dev/ttyS7
 ```
