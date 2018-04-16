@@ -8,7 +8,7 @@ android {
         minSdkVersion 15
         targetSdkVersion 23
         versionCode 3
-        versionName "1.1.1"
+        versionName "1.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
@@ -26,7 +26,7 @@ dependencies {
     implementation 'com.android.support:appcompat-v7:23.0.0'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     implementation files('libs/e9631_can_sdk_v1.0.jar')
-    implementation files('libs/uartsdk_v1.0.jar')
+    implementation files('libs/uartsdk_v1.1.jar')
     implementation 'com.android.support:design:23.0.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }

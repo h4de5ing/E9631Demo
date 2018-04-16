@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.unistrong.e9631sdk.Command;
 import com.unistrong.e9631sdk.CommunicationService;
@@ -136,13 +137,20 @@ public class CanActivity extends BaseActivity implements View.OnClickListener {
                 sendCommand(Command.Send.Switch500K());
                 break;
             case R.id.btn_send_data:
-/*                byte[] id = new byte[]{0x00, 0x00, 0x00, 0x00};
+                   /*byte[] id = new byte[]{0x00, 0x00, 0x00, 0x00};
                 byte[] data = new byte[]{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08};
                 sendCanData(id, data);*/
-
                 String strID = etId.getText().toString();
                 String strData = etData.getText().toString();
-                sendCanData(int2byte(strID, 4), int2byte(strData, 8));
+                if (strID.length() % 2 == 0 || strID.length() != 8) {
+                    if (strData.length() % 2 == 0 || strData.length() != 16) {
+                        sendCanData(int2byte(strID, 4), int2byte(strData, 8));
+                    } else {
+                        Toast.makeText(CanActivity.this, "error data", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(CanActivity.this, "error id", Toast.LENGTH_SHORT).show();
+                }
                 break;
         }
     }

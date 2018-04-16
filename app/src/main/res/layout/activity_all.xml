@@ -6,48 +6,91 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="130dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="130dp">
+
+        <com.unistrong.demo.view.TitleLinearLayout
+            android:layout_width="270dp"
+            android:layout_height="85dp"
+            android:background="@drawable/circle"
+            android:paddingTop="20dp"
+            app:tipText="4G" />
+
+        <TextView
+            android:id="@+id/tv_gsm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="30dp"
+            android:layout_marginTop="30dp"
+            android:gravity="center"
+            android:textSize="20dp"
+            tools:text="GSM" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="225dp"
         android:orientation="vertical">
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/btn_volume_plug"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Volume +" />
-
-            <Button
-                android:id="@+id/btn_volume_sub"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Volume -" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+        <com.unistrong.demo.view.TitleLinearLayout
+            android:layout_width="260dp"
+            android:layout_height="80dp"
+            android:background="@drawable/circle"
+            android:orientation="horizontal"
+            android:paddingTop="20dp"
+            app:tipText="GPS">
 
             <Button
                 android:id="@+id/btn_gps"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="30dp"
                 android:text="GPS" />
+        </com.unistrong.demo.view.TitleLinearLayout>
 
-            <Button
-                android:id="@+id/btn_dashboard"
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="310dp"
+        android:orientation="vertical">
+
+        <com.unistrong.demo.view.TitleLinearLayout
+            android:layout_width="260dp"
+            android:layout_height="80dp"
+            android:background="@drawable/circle"
+            android:orientation="horizontal"
+            app:tipText="Misc">
+
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Dashboard" />
-        </LinearLayout>
-    </LinearLayout>
+                android:layout_marginLeft="30dp"
+                android:layout_marginTop="30dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btn_volume_plug"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Volume +" />
+
+                <Button
+                    android:id="@+id/btn_volume_sub"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Volume -" />
+            </LinearLayout>
+        </com.unistrong.demo.view.TitleLinearLayout>
+    </RelativeLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -57,7 +100,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="2"
+            android:layout_weight="1"
             android:orientation="horizontal">
 
             <LinearLayout
@@ -68,7 +111,7 @@
                 android:orientation="vertical">
 
                 <com.unistrong.demo.view.TitleLinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="260dp"
                     android:layout_height="120dp"
                     android:background="@drawable/circle"
                     android:orientation="vertical"
@@ -99,68 +142,8 @@
                     android:background="@drawable/circle"
                     android:orientation="horizontal"
                     android:paddingTop="20dp"
-                    app:tipText="2 CVBS">
+                    app:tipText="CVBS" />
 
-                    <RelativeLayout
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"></RelativeLayout>
-
-                    <RelativeLayout
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1">
-
-                        <TextureView
-                            android:id="@+id/video7"
-                            android:layout_width="250dp"
-                            android:layout_height="250dp" />
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="20dp"
-                            android:gravity="center">
-
-                            <Chronometer
-                                android:id="@+id/tv_recording_time7"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="20dp"
-                                android:drawableLeft="@drawable/ic_recording_indicator"
-                                android:gravity="center"
-                                android:textColor="@android:color/white"
-                                android:visibility="gone"
-                                tools:visibility="visible" />
-
-                            <Button
-                                android:id="@+id/btn_take_picture7"
-                                android:layout_width="30dp"
-                                android:layout_height="30dp"
-                                android:layout_marginLeft="5dp"
-                                android:background="@drawable/ic_photo_camera_black_24dp"
-                                android:textColor="@android:color/white"
-                                tools:text="capture" />
-
-                            <Button
-                                android:id="@+id/btn_record7"
-                                android:layout_width="30dp"
-                                android:layout_height="30dp"
-                                android:layout_marginLeft="5dp"
-                                android:background="@drawable/ic_play_arrow_black_24dp"
-                                android:textColor="@android:color/white"
-                                tools:text="record" />
-
-                            <Button
-                                android:id="@+id/btn_full7"
-                                android:layout_width="30dp"
-                                android:layout_height="30dp"
-                                android:layout_marginLeft="5dp"
-                                android:background="@drawable/ic_fullscreen_black_24dp"
-                                android:visibility="gone" />
-                        </LinearLayout>
-                    </RelativeLayout>
-                </com.unistrong.demo.view.TitleLinearLayout>
             </LinearLayout>
         </LinearLayout>
 
@@ -169,41 +152,11 @@
             android:layout_height="0dp"
             android:layout_weight="1">
 
-
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_margin="10dp"
-                android:layout_weight="1">
-
-                <com.unistrong.demo.view.TitleLinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/circle"
-                    android:orientation="horizontal"
-                    android:paddingTop="20dp"
-                    app:tipText="GSM">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-
-                        <TextView
-                            android:id="@+id/tv_gsm"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:gravity="center"
-                            android:paddingBottom="10dp"
-                            android:paddingLeft="10dp"
-                            android:paddingRight="10dp"
-                            android:paddingTop="10dp"
-                            android:textSize="20dp"
-                            tools:text="GSM" />
-                    </LinearLayout>
-                </com.unistrong.demo.view.TitleLinearLayout>
-            </LinearLayout>
+                android:layout_weight="1" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -229,13 +182,19 @@
                             android:id="@+id/btn_obd_start"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="start can1" />
+                            android:text="can1" />
 
                         <Button
                             android:id="@+id/btn_obd_start2"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="start can2" />
+                            android:text="can2" />
+
+                        <Button
+                            android:id="@+id/btn_dashboard"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Dash\tboard" />
                     </LinearLayout>
 
                     <TextView
@@ -299,58 +258,120 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_marginLeft="550dp"
+        android:layout_marginTop="23dp">
 
-        <TextureView
-            android:id="@+id/video6"
-            android:layout_width="250dp"
-            android:layout_height="250dp"
-            android:layout_marginLeft="285dp"
-            android:layout_marginTop="22dp" />
+        <com.unistrong.demo.view.TitleLinearLayout
+            android:layout_width="200dp"
+            android:layout_height="180dp"
+            android:background="@drawable/circle"
+            android:paddingTop="25dp"
+            app:tipText="Camera 2" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="25dp"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <Chronometer
-                android:id="@+id/tv_recording_time6"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:drawableLeft="@drawable/ic_recording_indicator"
-                android:textColor="@android:color/white"
-                android:visibility="gone"
-                tools:visibility="visible" />
-
-            <Button
-                android:id="@+id/btn_take_picture6"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_marginLeft="5dp"
-                android:background="@drawable/ic_photo_camera_black_24dp"
-                android:textColor="@android:color/white"
-                tools:text="capture" />
-
-            <Button
-                android:id="@+id/btn_record6"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_marginLeft="5dp"
-                android:background="@drawable/ic_play_arrow_black_24dp"
-                android:textColor="@android:color/white"
-                tools:text="record" />
-
-            <Button
-                android:id="@+id/btn_full6"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_marginLeft="5dp"
-                android:background="@drawable/ic_fullscreen_black_24dp"
-                android:visibility="gone" />
-
-        </LinearLayout>
     </RelativeLayout>
+
+    <TextureView
+        android:id="@+id/video7"
+        android:layout_width="180dp"
+        android:layout_height="144dp"
+        android:layout_marginLeft="560dp"
+        android:layout_marginTop="53dp" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="560dp"
+        android:layout_marginTop="53dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <Chronometer
+            android:id="@+id/tv_recording_time7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:drawableLeft="@drawable/ic_recording_indicator"
+            android:textColor="@android:color/white"
+            android:visibility="invisible"
+            tools:visibility="visible" />
+
+        <Button
+            android:id="@+id/btn_take_picture7"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginLeft="5dp"
+            android:background="@drawable/ic_photo_camera_black_24dp"
+            android:textColor="@android:color/white"
+            tools:text="capture" />
+
+        <Button
+            android:id="@+id/btn_record7"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginLeft="20dp"
+            android:background="@drawable/ic_play_arrow_black_24dp"
+            android:textColor="@android:color/white"
+            tools:text="record" />
+
+    </LinearLayout>
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="300dp"
+        android:layout_marginTop="23dp">
+
+        <com.unistrong.demo.view.TitleLinearLayout
+            android:layout_width="200dp"
+            android:layout_height="180dp"
+            android:background="@drawable/circle"
+            android:paddingTop="25dp"
+            app:tipText="Camera 1" />
+
+    </RelativeLayout>
+
+    <TextureView
+        android:id="@+id/video6"
+        android:layout_width="180dp"
+        android:layout_height="144dp"
+        android:layout_marginLeft="310dp"
+        android:layout_marginTop="53dp" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="310dp"
+        android:layout_marginTop="55dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <Chronometer
+            android:id="@+id/tv_recording_time6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:drawableLeft="@drawable/ic_recording_indicator"
+            android:textColor="@android:color/white"
+            android:visibility="invisible"
+            tools:visibility="visible" />
+
+        <Button
+            android:id="@+id/btn_take_picture6"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginLeft="5dp"
+            android:background="@drawable/ic_photo_camera_black_24dp"
+            android:textColor="@android:color/white" />
+
+        <Button
+            android:id="@+id/btn_record6"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginLeft="20dp"
+            android:background="@drawable/ic_play_arrow_black_24dp"
+            android:textColor="@android:color/white" />
+
+    </LinearLayout>
 </RelativeLayout>
