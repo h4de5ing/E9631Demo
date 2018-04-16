@@ -291,7 +291,7 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
 
     private void openUart() {
         vanManager = new VanManager();
-        boolean uart4opend = vanManager.openUart4();
+        boolean uart4opend = vanManager.openUart4(115200);
         updateUartText(uart4opend ? "uart4 opend success" : "uart4 opend failed");
         vanManager.uartData4(new ProcessData() {
             @Override
@@ -299,7 +299,7 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
                 updateUartText("uart4:[ " + len + " ]" + new String(bytes));
             }
         });
-        boolean uart6opend = vanManager.openUart6();
+        boolean uart6opend = vanManager.openUart6(115200);
         updateUartText(uart6opend ? "uart6 opend success" : "uart6 opend failed");
         vanManager.uartData6(new ProcessData() {
             @Override
@@ -307,7 +307,7 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
                 updateUartText("uart6:[ " + len + " ]" + new String(bytes));
             }
         });
-        boolean uart7opend = vanManager.openUart7();
+        boolean uart7opend = vanManager.openUart7(115200);
         updateUartText(uart7opend ? "uart7 opend success" : "uart7 opend success");
         vanManager.uartData7(new ProcessData() {
             @Override

@@ -9,14 +9,13 @@ import android.widget.TextView;
 
 import com.unistrong.uartsdk.ProcessData;
 import com.unistrong.uartsdk.VanManager;
-import com.van.uart.UartManager;
 
 public class UartActivity extends BaseActivity implements View.OnClickListener {
     private EditText etSend;
     private VanManager vanManager;
     private String text;
     private TextView tvResult;
-    private UartManager.BaudRate baudRate = UartManager.BaudRate.B115200;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,7 +32,7 @@ public class UartActivity extends BaseActivity implements View.OnClickListener {
 
     private void openUart() {
         vanManager = new VanManager();
-        boolean uart4opend = vanManager.openUart4(baudRate);
+        boolean uart4opend = vanManager.openUart4(115200);//2400 4800 9600 19200 57600 115200
         updateText(uart4opend ? "uart4 opend success" : "uart4 opend failed");
         vanManager.uartData4(new ProcessData() {
             @Override
@@ -41,7 +40,7 @@ public class UartActivity extends BaseActivity implements View.OnClickListener {
                 updateText("uart4:" + new String(bytes) + ",length:" + len);
             }
         });
-        boolean uart6opend = vanManager.openUart6(baudRate);
+        boolean uart6opend = vanManager.openUart6(115200);//2400 4800 9600 19200 57600 115200
         updateText(uart6opend ? "uart6 opend success" : "uart6 opend failed");
         vanManager.uartData6(new ProcessData() {
             @Override
@@ -49,7 +48,7 @@ public class UartActivity extends BaseActivity implements View.OnClickListener {
                 updateText("uart6:" + new String(bytes) + ",length:" + len);
             }
         });
-        boolean uart7opend = vanManager.openUart7(baudRate);
+        boolean uart7opend = vanManager.openUart7(115200);//2400 4800 9600 19200 57600 115200
         updateText(uart7opend ? "uart7 opend success" : "uart7 opend success");
         vanManager.uartData7(new ProcessData() {
             @Override
