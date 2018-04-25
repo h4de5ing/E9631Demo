@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.os.RemoteException;
 import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.PhoneStateListener;
@@ -33,6 +34,7 @@ import com.unistrong.demo.cvbsVideo.VideoStorage;
 import com.unistrong.demo.dashboard.DashboardActivity;
 import com.unistrong.demo.gps.GPSActivity;
 import com.unistrong.demo.utils.SpannableStringUtils;
+import com.unistrong.e9631dmeo.IVideoCallback;
 import com.unistrong.e9631sdk.Command;
 import com.unistrong.e9631sdk.CommunicationService;
 import com.unistrong.e9631sdk.DataType;
@@ -107,6 +109,7 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
         tvMCUInfo.setMovementMethod(new ScrollingMovementMethod());
         tvCanInfo.setMovementMethod(new ScrollingMovementMethod());
         tvUartInfo.setMovementMethod(new ScrollingMovementMethod());
+        bindVideoService();
         initTextureView();
         openUart();
         initBind();
@@ -121,7 +124,7 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
     protected void onResume() {
         super.onResume();
         bindVideoService();
-        //initTextureView();
+        initTextureView();
     }
 
     @Override
@@ -143,8 +146,8 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
         } catch (Exception e) {
             e.printStackTrace();
         }
-        //stopPreview(camera6ID);
-        //stopPreview(camera7ID);
+        stopPreview(camera6ID);
+        stopPreview(camera7ID);
         //mCVBSService.closeCamera(camera6ID);
         //mCVBSService.closeCamera(camera7ID);
         unbindVideoService();
@@ -174,6 +177,7 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
         //if (mCVBSService.getPreviewState(camera6ID)) mCVBSService.stopPreview(camera6ID);
         //if (mCVBSService.getPreviewState(camera7ID)) mCVBSService.stopPreview(camera7ID);
         if (!getRecordingState(camera6ID) && !getRecordingState(camera7ID)) stopVideoService();
+        //unbindVideoService();
     }
 
     private void startVideoService() {
@@ -806,8 +810,8 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
                 @Override
                 public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
                     if (mCVBSService != null) {
-                        //mCVBSService.stopPreview(camera6ID);
-                        //mCVBSService.closeCamera(camera6ID);
+                        stopPreview(camera6ID);
+                        closeCamera(camera6ID);
                     }
                     return true;
                 }
@@ -833,8 +837,8 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
                 @Override
                 public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
                     if (mCVBSService != null) {
-                        //mCVBSService.stopPreview(camera7ID);
-                        //mCVBSService.closeCamera(camera7ID);
+                       stopPreview(camera7ID);
+                       closeCamera(camera7ID);
                     }
                     return true;
                 }
@@ -870,6 +874,11 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
             mCVBSService.stopPreview(cameraId);
         }
     }
+    private void closeCamera(int cameraId) {
+        if (mCVBSService != null) {
+            mCVBSService.closeCamera(cameraId);
+        }
+    }
 
     private VideoService mCVBSService = null;
     private ServiceConnection mVideoServiceConn = new ServiceConnection() {
@@ -878,13 +887,13 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
             initVideo6();
             initVideo7();
             if (mCVBSService != null) {
-                //mCVBSService.registerCallback(mVideoCallback);
+                mCVBSService.registerCallback(mVideoCallback);
             }
         }
 
         public void onServiceDisconnected(ComponentName classname) {
             if (mCVBSService != null) {
-                //mCVBSService.unregisterCallback(mVideoCallback);
+                mCVBSService.unregisterCallback(mVideoCallback);
             }
             mCVBSService = null;
         }
@@ -906,6 +915,12 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
             return mCVBSService.getRecordingState(index);
         return false;
     }
+
+    private IVideoCallback.Stub mVideoCallback = new IVideoCallback.Stub() {
+        @Override
+        public void onUpdateTimes(int index, String times) throws RemoteException {
+        }
+    };
 
     @Override
     public void onBackPressed() {
