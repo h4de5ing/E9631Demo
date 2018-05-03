@@ -1,40 +1,34 @@
 package com.unistrong.demo;
 
 import android.annotation.SuppressLint;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
-import android.graphics.Color;
 import android.graphics.SurfaceTexture;
+import android.hardware.Camera;
 import android.media.AudioManager;
+import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
 import android.os.Message;
-import android.os.RemoteException;
 import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.PhoneStateListener;
 import android.telephony.SignalStrength;
 import android.telephony.TelephonyManager;
-import android.text.SpannableStringBuilder;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.TextureView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Chronometer;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.unistrong.demo.cvbsVideo.VideoService;
-import com.unistrong.demo.cvbsVideo.VideoStorage;
 import com.unistrong.demo.dashboard.DashboardActivity;
 import com.unistrong.demo.gps.GPSActivity;
-import com.unistrong.demo.utils.SpannableStringUtils;
-import com.unistrong.e9631dmeo.IVideoCallback;
+import com.unistrong.demo.view.TitleLinearLayout;
 import com.unistrong.e9631sdk.Command;
 import com.unistrong.e9631sdk.CommunicationService;
 import com.unistrong.e9631sdk.DataType;
@@ -43,6 +37,8 @@ import com.unistrong.uartsdk.VanManager;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -52,8 +48,10 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class AllActivity extends AppCompatActivity implements View.OnClickListener {
+public class AllActivity2 extends AppCompatActivity implements View.OnClickListener {
     private static final String TAG = "gh0st";
+    public static Camera mCamera6;
+    public static Camera mCamera7;
     public static final int camera6ID = 6;
     public static final int camera7ID = 7;
     private TextureView video6;
@@ -64,28 +62,35 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
     private Button btnRecord7;
     private Chronometer tvRecordingTime6;
     private Chronometer tvRecordingTime7;
+    private boolean isRecording6 = false;
+    private boolean isRecording7 = false;
     private TextView tvMCUInfo;
     private TextView tvCanInfo;
     private TextView tvUartInfo;
+    private TextView tvCurrentVolume;
     private TextView tvGSM;
     private VanManager vanManager;
     private MyPhoneStateListener myPhoneStateListener;
-    private SurfaceTexture mSurfaceTexture6;
-    private SurfaceTexture mSurfaceTexture7;
+    private LinearLayout ll_video6;
+    private TitleLinearLayout tll_video6;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_all);
-        startVideoService();
+        setContentView(R.layout.activity_all2);
+        Log.i("gh0st", "AllActivity2");
         tvMCUInfo = (TextView) findViewById(R.id.tv_mcu_info);
         tvCanInfo = (TextView) findViewById(R.id.tv_can_info);
         tvUartInfo = (TextView) findViewById(R.id.tv_uart_info);
         tvGSM = (TextView) findViewById(R.id.tv_gsm);
+        tvCurrentVolume = (TextView) findViewById(R.id.tv_current_volume);
         video6 = (TextureView) findViewById(R.id.video6);
         btnTakePicture6 = (Button) findViewById(R.id.btn_take_picture6);
         btnRecord6 = (Button) findViewById(R.id.btn_record6);
         tvRecordingTime6 = (Chronometer) findViewById(R.id.tv_recording_time6);
+        ll_video6 = (LinearLayout) findViewById(R.id.ll_video6);
+        tll_video6 = (TitleLinearLayout) findViewById(R.id.tll_video6);
 
         video7 = (TextureView) findViewById(R.id.video7);
         btnTakePicture7 = (Button) findViewById(R.id.btn_take_picture7);
@@ -109,8 +114,6 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
         tvMCUInfo.setMovementMethod(new ScrollingMovementMethod());
         tvCanInfo.setMovementMethod(new ScrollingMovementMethod());
         tvUartInfo.setMovementMethod(new ScrollingMovementMethod());
-        bindVideoService();
-        initTextureView();
         openUart();
         initBind();
         //btnOBDStart.performClick();
@@ -118,76 +121,6 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
         initGSM();
         initVolumes();
         updateMCUText();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        bindVideoService();
-        initTextureView();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        try {
-            if (getRecordingState(camera6ID)) {
-                mCVBSService.stopVideoRecording(camera6ID);
-                btnRecord6.setBackgroundResource(R.drawable.ic_play_arrow_black_24dp);
-                tvRecordingTime6.stop();
-                tvRecordingTime6.setVisibility(View.INVISIBLE);
-            }
-            if (getRecordingState(camera7ID)) {
-                mCVBSService.stopVideoRecording(camera7ID);
-                btnRecord7.setBackgroundResource(R.drawable.ic_play_arrow_black_24dp);
-                tvRecordingTime7.stop();
-                tvRecordingTime7.setVisibility(View.INVISIBLE);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        stopPreview(camera6ID);
-        stopPreview(camera7ID);
-        //mCVBSService.closeCamera(camera6ID);
-        //mCVBSService.closeCamera(camera7ID);
-        unbindVideoService();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        vanManager.closeUart4();
-        if (mService != null) {
-            try {
-                mService.unbind();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        if (timer != null) {
-            timer.cancel();
-            timer.purge();
-            timer = null;
-        }
-        if (mMcuTimer != null) {
-            mMcuTimer.cancel();
-            mMcuTimer.purge();
-            mMcuTimer = null;
-        }
-        //if (mCVBSService.getPreviewState(camera6ID)) mCVBSService.stopPreview(camera6ID);
-        //if (mCVBSService.getPreviewState(camera7ID)) mCVBSService.stopPreview(camera7ID);
-        if (!getRecordingState(camera6ID) && !getRecordingState(camera7ID)) stopVideoService();
-        //unbindVideoService();
-    }
-
-    private void startVideoService() {
-        Intent intent = new Intent(AllActivity.this, VideoService.class);
-        startService(intent);
-    }
-
-    private void stopVideoService() {
-        Intent intent = new Intent(this, VideoService.class);
-        stopService(intent);
     }
 
     private AudioManager mAudioManager;
@@ -199,34 +132,35 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
         if (mAudioManager != null) {
             mMaxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
             mCurrentVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+            tvCurrentVolume.setText("" + mCurrentVolume);
         }
     }
 
     private void updateVolumes() {
         Log.i(TAG, "Current:" + mCurrentVolume);
+        tvCurrentVolume.setText("" + mCurrentVolume);
     }
 
     private Timer mMcuTimer;
-    private boolean isResponse = false;
+    private boolean isSend = false;
 
     private void initMcuTimer() {
         mMcuTimer = new Timer();
         mMcuTimer.schedule(new TimerTask() {
             @Override
             public void run() {
-                isResponse = false;
                 String status = readStatus(acStatus);
                 if ("1".equals(status)) {// ac charger is plugged
-                    mHandler.sendEmptyMessageDelayed(0, 100);
+                    if (!isSend) {
+                        mHandler.sendEmptyMessageDelayed(0, 100);
+                        isSend = true;
+                    }
                 } else {//ac charger not plugged
-                    mVersion = "NULL";
-                    mVoltage = "NULL";
                     mAccStatus = false;
-                    mGpio_mileage = false;
-                    mGpio_rada = false;
-                    mHandler.sendEmptyMessageDelayed(1, 1000);
+                    isSend = false;
+                    updateMCUText();
                 }
-                Log.i(TAG, "ac charger detection: " + status);
+                Log.i(TAG, "电源检测 " + status);
             }
         }, 10000, 2000);
     }
@@ -339,6 +273,171 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        initCamera();
+        initTextureView();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        try {
+            if (isRecording6) {
+                //tvRecordingTime6.stop();
+                //tvRecordingTime6.setVisibility(View.GONE);
+                //isRecording6 = false;
+                ////btnRecord6.setText("record");
+                //btnRecord6.setBackgroundResource(R.drawable.ic_play_arrow_black_24dp);
+                //stopRecording6();
+            }
+            if (isRecording7) {
+                //tvRecordingTime7.stop();
+                //tvRecordingTime7.setVisibility(View.GONE);
+                //isRecording7 = false;
+                ////btnRecord7.setText("record");
+                //btnRecord7.setBackgroundResource(R.drawable.ic_play_arrow_black_24dp);
+                //stopRecording7();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        stopPreview();
+        //closeCamera();
+    }
+
+    private void initCamera() {
+        try {
+            if (mCamera6 == null) {
+                mCamera6 = Camera.open(camera6ID);
+            }
+            if (mCamera7 == null) {
+                mCamera7 = Camera.open(camera7ID);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "camera is not available check[android.permission.CAMERA]");
+        }
+    }
+
+    public void initTextureView() {
+        if (video6 != null) {
+            video6.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
+                @Override
+                public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+                    if (mCamera6 != null) {
+                        try {
+                            mCamera6.startPreview();
+                            SystemClock.sleep(200);
+                            mCamera6.setPreviewTexture(surface);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+                @Override
+                public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+
+                }
+
+                @Override
+                public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+                    mCamera6.stopPreview();
+                    //mCamera6.release();
+                    return true;
+                }
+
+                @Override
+                public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+
+                }
+            });
+        }
+        if (video7 != null) {
+            video7.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
+                @Override
+                public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+                    if (mCamera7 != null) {
+                        try {
+                            mCamera7.startPreview();
+                            SystemClock.sleep(200);
+                            mCamera7.setPreviewTexture(surface);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+                @Override
+                public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+                }
+
+                @Override
+                public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+                    //mCamera7.setPreviewCallback(null);
+                    mCamera7.stopPreview();
+                    //mCamera7.release();
+                    return true;
+                }
+
+                @Override
+                public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+
+                }
+            });
+        }
+    }
+
+    public void stopPreview() {
+        if (mCamera6 != null) {
+            mCamera6.stopPreview();
+            Log.i(TAG, "stopPreview");
+        }
+        if (mCamera7 != null) {
+            mCamera7.stopPreview();
+            Log.i(TAG, "stopPreview");
+        }
+    }
+
+    public void closeCamera() {
+        if (mCamera6 != null) {
+            mCamera6.release();
+            mCamera6 = null;
+        }
+        if (mCamera7 != null) {
+            mCamera7.release();
+            mCamera7 = null;
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        //stopPreview();
+        closeCamera();
+        //vanManager.closeUart4();
+        //vanManager.closeUart6();
+        //vanManager.closeUart7();
+        if (mService != null) {
+            try {
+                mService.unbind();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        if (timer != null) {
+            timer.cancel();
+            timer.purge();
+            timer = null;
+        }
+        if (mMcuTimer != null) {
+            mMcuTimer.cancel();
+            mMcuTimer.purge();
+            mMcuTimer = null;
+        }
+    }
+
     private CommunicationService mService;
     private boolean isStart = false;
     //public byte ECUType = (byte) 0xDF;
@@ -350,16 +449,6 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
             switch (msg.what) {
                 case 0:
                     sendCommandList();
-                    break;
-                case 1:
-                    updateMCUText();
-                    break;
-                case 2:
-                    if (!isResponse) {
-                        mGpio_mileage = false;
-                        mGpio_rada = false;
-                        updateMCUText();
-                    }
                     break;
             }
         }
@@ -379,7 +468,6 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
                     sendCommand(bytes);
                     SystemClock.sleep(300);
                 }
-                mHandler.sendEmptyMessageDelayed(2, 200);
             }
         }).start();
     }
@@ -390,7 +478,6 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
     private boolean isFullScreen6 = false;
     private boolean isFullScreen7 = false;
 
-    //gh0stOnClick
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -398,27 +485,16 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
                 if (mService != null) {
                     isStart = true;
                     sendCommand(Command.Send.Channel1());
+                    sendOBDData(start11);
                     mHandler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            sendCommand(Command.Send.SearchMode());
+                            if (App.Companion.getAECUType() == (byte) 0xDF) {
+                                updateOBDText("can 1 connect failed");
+                            }
+                            isStart = false;
                         }
-                    }, 200);
-                    mHandler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            sendOBDData(start11);
-                            mHandler.postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (App.Companion.getAECUType() == (byte) 0xDF) {
-                                        updateOBDText("can 1 connect failed");
-                                    }
-                                    isStart = false;
-                                }
-                            }, 3000);
-                        }
-                    }, 500);
+                    }, 3000);
                 }
                 break;
             case R.id.btn_obd_start2:
@@ -453,7 +529,6 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
                 if (mCurTime - mLastTime < 300) {
                     mCurTime = 0;
                     mLastTime = 0;
-                    Log.i(TAG, "double click");
                     if (!isFullScreen6) {
                         fullScale6();
                     } else {
@@ -468,7 +543,6 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
                 if (mCurTime - mLastTime < 300) {
                     mCurTime = 0;
                     mLastTime = 0;
-                    Log.i(TAG, "double click");
                     if (!isFullScreen7) {
                         fullScale7();
                     } else {
@@ -515,10 +589,10 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
                 }
                 break;
             case R.id.btn_gps:
-                startActivity(new Intent(AllActivity.this, GPSActivity.class));
+                startActivity(new Intent(AllActivity2.this, GPSActivity.class));
                 break;
             case R.id.btn_dashboard:
-                startActivity(new Intent(AllActivity.this, DashboardActivity.class));
+                startActivity(new Intent(AllActivity2.this, DashboardActivity.class));
                 break;
         }
     }
@@ -538,6 +612,9 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
     private void fullScale7() {
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(720, 576);
         video7.setLayoutParams(params);
+        tll_video6.setVisibility(View.GONE);
+        ll_video6.setVisibility(View.GONE);
+        video6.setVisibility(View.GONE);
     }
 
     private void smallScale7() {
@@ -545,6 +622,9 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
         params.topMargin = 53;
         params.leftMargin = 560;
         video7.setLayoutParams(params);
+        tll_video6.setVisibility(View.VISIBLE);
+        ll_video6.setVisibility(View.VISIBLE);
+        video6.setVisibility(View.VISIBLE);
     }
 
     private boolean mAccStatus = false;
@@ -589,9 +669,6 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
                             updateOBDText("current channel " + bytes[0]);
                             break;
                         case TDataMode:
-                            if (bytes[0] != 0x02) {
-                                sendCommand(Command.Send.ModeOBD());
-                            }
                             updateOBDText("current mode " + DataUtils.getDataMode(bytes[0]));
                             break;
                         case TDataCan:
@@ -605,7 +682,6 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
                         case TUnknow:
                             break;
                         case TGPIO:
-                            isResponse = true;
                             if (bytes[0] == 0x12) {
                                 mGpio_rada = true;
                             } else if (bytes[0] == 0x22) {
@@ -629,28 +705,7 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    SpannableStringBuilder string = SpannableStringUtils.getBuilder("MCUVersion:")
-                            .setForegroundColor(Color.BLACK)
-                            .append(mVersion)
-                            .setForegroundColor(Color.BLACK)
-                            .append("\nVoltage:")
-                            .setForegroundColor(Color.BLACK)
-                            .append(mVoltage)
-                            .setForegroundColor(Color.BLACK)
-                            .append("\nAccStatus:")
-                            .setForegroundColor(Color.BLACK)
-                            .append("" + (mAccStatus ? "ON" : "OFF"))
-                            .setForegroundColor(mAccStatus ? Color.RED : Color.BLACK)
-                            .append("\nGPIORada:")
-                            .setForegroundColor(Color.BLACK)
-                            .append(mGpio_rada ? "High" : "Low")
-                            .setForegroundColor(mGpio_rada ? Color.RED : Color.BLACK)
-                            .append("\nGPIOMileage:")
-                            .setForegroundColor(Color.BLACK)
-                            .append(mGpio_mileage ? "High" : "Low")
-                            .setForegroundColor(mGpio_rada ? Color.RED : Color.BLACK)
-                            .create();
-                    tvMCUInfo.setText(string);
+                    tvMCUInfo.setText("MCUVersion:" + mVersion + "\nVoltage:" + mVoltage + "\nAccStatus:" + mAccStatus + "\nGPIORada:" + mGpio_rada + "\nGPIOMileage:" + mGpio_mileage);
                 }
             });
         }
@@ -738,209 +793,247 @@ public class AllActivity extends AppCompatActivity implements View.OnClickListen
         }, 5000, 1000);
     }
 
-    //gh0stcvbs
     private void takePicture6() {
-        if (mCVBSService != null) {
-            mCVBSService.takePicture(camera6ID);
-            Toast.makeText(AllActivity.this, "take done 6", Toast.LENGTH_SHORT).show();
+        if (mCamera6 != null) {
+            mCamera6.takePicture(null, null, new Camera.PictureCallback() {
+                @Override
+                public void onPictureTaken(byte[] data, Camera camera) {
+                    File pictureFile = FileUtils.getOutputMediaFile(FileUtils.MEDIA_TYPE_IMAGE);
+                    try {
+                        FileOutputStream fos = new FileOutputStream(pictureFile);
+                        fos.write(data);
+                        fos.close();
+                        camera.startPreview();
+                    } catch (FileNotFoundException e) {
+                        Log.d(TAG, "File not found: " + e.getMessage());
+                    } catch (IOException e) {
+                        Log.d(TAG, "Error accessing file: " + e.getMessage());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    Log.i(TAG, "done:" + pictureFile.getAbsolutePath());
+                    Toast.makeText(AllActivity2.this, "take done 6", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     }
 
     private void takePicture7() {
-        if (mCVBSService != null) {
-            mCVBSService.takePicture(camera7ID);
-            Toast.makeText(AllActivity.this, "take done 7", Toast.LENGTH_SHORT).show();
+        if (mCamera7 != null) {
+            mCamera7.takePicture(null, null, new Camera.PictureCallback() {
+                @Override
+                public void onPictureTaken(byte[] data, Camera camera) {
+                    File pictureFile = FileUtils.getOutputMediaFile(FileUtils.MEDIA_TYPE_IMAGE);
+                    try {
+                        FileOutputStream fos = new FileOutputStream(pictureFile);
+                        fos.write(data);
+                        fos.close();
+                        camera.startPreview();
+                    } catch (FileNotFoundException e) {
+                        Log.d(TAG, "File not found: " + e.getMessage());
+                    } catch (IOException e) {
+                        Log.d(TAG, "Error accessing file: " + e.getMessage());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    Log.i(TAG, "done:" + pictureFile.getAbsolutePath());
+                    Toast.makeText(AllActivity2.this, "take done 7", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     }
 
-
     private void record6() {
-        if (new File(VideoStorage.fileRootPath).exists()) {
-            if (mCVBSService != null) {
-                if (getRecordingState(camera6ID)) {
-                    mCVBSService.stopVideoRecording(camera6ID);
-                    tvRecordingTime6.stop();
-                    tvRecordingTime6.setVisibility(View.INVISIBLE);
-                    btnRecord6.setBackgroundResource(R.drawable.ic_play_arrow_black_24dp);
-                } else {
-                    mCVBSService.startVideoRecording(camera6ID, mSurfaceTexture6);
-                    tvRecordingTime6.setVisibility(View.VISIBLE);
-                    tvRecordingTime6.setBase(SystemClock.elapsedRealtime());
-                    tvRecordingTime6.start();
-                    btnRecord6.setBackgroundResource(R.drawable.ic_stop_black_24dp);
-                }
+        if (isRecording6) {
+            tvRecordingTime6.stop();
+            tvRecordingTime6.setVisibility(View.GONE);
+            isRecording6 = false;
+            //btnRecord6.setText("record");
+            btnRecord6.setBackgroundResource(R.drawable.ic_play_arrow_black_24dp);
+            stopRecording6();
+        } else {
+            if (startRecording6()) {
+                tvRecordingTime6.setVisibility(View.VISIBLE);
+                tvRecordingTime6.setBase(SystemClock.elapsedRealtime());
+                tvRecordingTime6.start();
+                isRecording6 = true;
+                //btnRecord6.setText("stop");
+                btnRecord6.setBackgroundResource(R.drawable.ic_stop_black_24dp);
+            } else {
+                tvRecordingTime6.stop();
+                tvRecordingTime6.setVisibility(View.GONE);
+                isRecording6 = false;
+                //btnRecord6.setText("record");
+                btnRecord6.setBackgroundResource(R.drawable.ic_play_arrow_black_24dp);
             }
         }
     }
 
     private void record7() {
-        if (new File(VideoStorage.fileRootPath).exists()) {
-            if (mCVBSService != null) {
-                if (getRecordingState(camera7ID)) {
-                    mCVBSService.stopVideoRecording(camera7ID);
-                    tvRecordingTime7.stop();
-                    tvRecordingTime7.setVisibility(View.INVISIBLE);
-                    btnRecord7.setBackgroundResource(R.drawable.ic_play_arrow_black_24dp);
-                } else {
-                    mCVBSService.startVideoRecording(camera7ID, mSurfaceTexture7);
-                    tvRecordingTime7.setVisibility(View.VISIBLE);
-                    tvRecordingTime7.setBase(SystemClock.elapsedRealtime());
-                    tvRecordingTime7.start();
-                    btnRecord7.setBackgroundResource(R.drawable.ic_stop_black_24dp);
-                }
+        if (isRecording7) {
+            tvRecordingTime7.stop();
+            tvRecordingTime7.setVisibility(View.GONE);
+            isRecording7 = false;
+            //btnRecord7.setText("record");
+            btnRecord7.setBackgroundResource(R.drawable.ic_play_arrow_black_24dp);
+            stopRecording7();
+        } else {
+            if (startRecording7()) {
+                tvRecordingTime7.setVisibility(View.VISIBLE);
+                tvRecordingTime7.setBase(SystemClock.elapsedRealtime());
+                tvRecordingTime7.start();
+                isRecording7 = true;
+                //btnRecord7.setText("stop");
+                btnRecord7.setBackgroundResource(R.drawable.ic_stop_black_24dp);
+            } else {
+                tvRecordingTime7.stop();
+                tvRecordingTime7.setVisibility(View.GONE);
+                isRecording7 = false;
+                //btnRecord7.setText("record");
+                btnRecord7.setBackgroundResource(R.drawable.ic_play_arrow_black_24dp);
             }
         }
     }
 
+    private MediaRecorder mMediaRecorder6;
+    private MediaRecorder mMediaRecorder7;
 
-    public void initTextureView() {
-        if (video6 != null) {
-            video6.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
-                @Override
-                public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-                    mSurfaceTexture6 = surface;
-                    startPreview(camera6ID, surface);
-                }
-
-                @Override
-                public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-
-                }
-
-                @Override
-                public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-                    if (mCVBSService != null) {
-                        stopPreview(camera6ID);
-                        closeCamera(camera6ID);
-                    }
-                    return true;
-                }
-
-                @Override
-                public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-
-                }
-            });
+    public boolean startRecording6() {
+        if (prepareVideoRecorder6()) {
+            mMediaRecorder6.start();
+            return true;
+        } else {
+            releaseMediaRecorder6();
         }
-        if (video7 != null) {
-            video7.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
-                @Override
-                public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-                    mSurfaceTexture7 = surface;
-                    startPreview(camera7ID, surface);
-                }
-
-                @Override
-                public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-                }
-
-                @Override
-                public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-                    if (mCVBSService != null) {
-                       stopPreview(camera7ID);
-                       closeCamera(camera7ID);
-                    }
-                    return true;
-                }
-
-                @Override
-                public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-
-                }
-            });
-        }
-    }
-
-    private void initVideo6() {
-        if (mCVBSService != null) {
-            startPreview(camera6ID, video6.getSurfaceTexture());
-        }
-    }
-
-    private void initVideo7() {
-        if (mCVBSService != null) {
-            startPreview(camera7ID, video7.getSurfaceTexture());
-        }
-    }
-
-    private void startPreview(int cameraId, SurfaceTexture surfaceTexture) {
-        if (mCVBSService != null && (surfaceTexture != null)) {
-            mCVBSService.startPreview(cameraId, surfaceTexture);
-        }
-    }
-
-    public void stopPreview(int cameraId) {
-        if (mCVBSService != null) {
-            mCVBSService.stopPreview(cameraId);
-        }
-    }
-    private void closeCamera(int cameraId) {
-        if (mCVBSService != null) {
-            mCVBSService.closeCamera(cameraId);
-        }
-    }
-
-    private VideoService mCVBSService = null;
-    private ServiceConnection mVideoServiceConn = new ServiceConnection() {
-        public void onServiceConnected(ComponentName classname, IBinder obj) {
-            mCVBSService = ((VideoService.LocalBinder) obj).getService();
-            initVideo6();
-            initVideo7();
-            if (mCVBSService != null) {
-                mCVBSService.registerCallback(mVideoCallback);
-            }
-        }
-
-        public void onServiceDisconnected(ComponentName classname) {
-            if (mCVBSService != null) {
-                mCVBSService.unregisterCallback(mVideoCallback);
-            }
-            mCVBSService = null;
-        }
-    };
-
-    private void bindVideoService() {
-        Intent intent = new Intent(this, VideoService.class);
-        bindService(intent, mVideoServiceConn, Context.BIND_AUTO_CREATE);
-    }
-
-    private void unbindVideoService() {
-        if (mVideoServiceConn != null) {
-            unbindService(mVideoServiceConn);
-        }
-    }
-
-    private boolean getRecordingState(int index) {
-        if (mCVBSService != null)
-            return mCVBSService.getRecordingState(index);
         return false;
     }
 
-    private IVideoCallback.Stub mVideoCallback = new IVideoCallback.Stub() {
-        @Override
-        public void onUpdateTimes(int index, String times) throws RemoteException {
+
+    public void stopRecording6() {
+        if (mMediaRecorder6 != null) {
+            mMediaRecorder6.stop();
         }
-    };
+        releaseMediaRecorder6();
+    }
+
+    public boolean startRecording7() {
+        if (prepareVideoRecorder7()) {
+            mMediaRecorder7.start();
+            return true;
+        } else {
+            releaseMediaRecorder7();
+        }
+        return false;
+    }
+
+
+    public void stopRecording7() {
+        if (mMediaRecorder7 != null) {
+            mMediaRecorder7.stop();
+        }
+        releaseMediaRecorder7();
+    }
+
+    private boolean prepareVideoRecorder6() {
+        try {
+            mMediaRecorder6 = new MediaRecorder(1);
+            mCamera6.unlock();
+            mMediaRecorder6.setCamera(mCamera6);
+            mMediaRecorder6.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+            mMediaRecorder6.setOutputFormat(8);
+            mMediaRecorder6.setVideoFrameRate(30);
+            mMediaRecorder6.setVideoSize(720, 576);
+            mMediaRecorder6.setVideoEncodingBitRate(6000000);//6M
+            mMediaRecorder6.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
+            mMediaRecorder6.setOutputFile(FileUtils.getOutputMediaFile(FileUtils.MEDIA_TYPE_VIDEO).toString());
+            mMediaRecorder6.prepare();
+        } catch (IllegalStateException e) {
+            Log.d(TAG, "IllegalStateException preparing MediaRecorder: " + e.getMessage());
+            releaseMediaRecorder6();
+            return false;
+        } catch (IOException e) {
+            Log.d(TAG, "IOException preparing MediaRecorder: " + e.getMessage());
+            releaseMediaRecorder6();
+            return false;
+        } catch (Exception e) {
+            Log.d(TAG, "Exception preparing MediaRecorder: " + e.getMessage());
+            releaseMediaRecorder6();
+            return false;
+        }
+        return true;
+    }
+
+    private boolean prepareVideoRecorder7() {
+        try {
+            mMediaRecorder7 = new MediaRecorder(1);
+            mCamera7.unlock();
+            mMediaRecorder7.setCamera(mCamera7);
+            mMediaRecorder7.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+            mMediaRecorder7.setOutputFormat(8);
+            mMediaRecorder7.setVideoFrameRate(30);
+            mMediaRecorder7.setVideoSize(720, 576);
+            mMediaRecorder7.setVideoEncodingBitRate(6000000);//6M
+            mMediaRecorder7.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
+            mMediaRecorder7.setOutputFile(FileUtils.getOutputMediaFile(FileUtils.MEDIA_TYPE_VIDEO).toString());
+            mMediaRecorder7.prepare();
+        } catch (IllegalStateException e) {
+            Log.d(TAG, "IllegalStateException preparing MediaRecorder: " + e.getMessage());
+            releaseMediaRecorder7();
+            return false;
+        } catch (IOException e) {
+            Log.d(TAG, "IOException preparing MediaRecorder: " + e.getMessage());
+            releaseMediaRecorder7();
+            return false;
+        } catch (Exception e) {
+            Log.d(TAG, "Exception preparing MediaRecorder: " + e.getMessage());
+            releaseMediaRecorder7();
+            return false;
+        }
+        return true;
+    }
+
+    private void releaseMediaRecorder6() {
+        if (mMediaRecorder6 != null) {
+            mMediaRecorder6.reset();
+            mMediaRecorder6.release();
+            mMediaRecorder6 = null;
+            mCamera6.lock();
+        }
+    }
+
+    private void releaseMediaRecorder7() {
+        if (mMediaRecorder7 != null) {
+            mMediaRecorder7.reset();
+            mMediaRecorder7.release();
+            mMediaRecorder7 = null;
+            mCamera7.lock();
+        }
+    }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
         try {
-            if (getRecordingState(camera6ID)) {
-                mCVBSService.stopVideoRecording(camera6ID);
+            if (isRecording6) {
+                tvRecordingTime6.setVisibility(View.GONE);
+                isRecording6 = false;
+                //btnRecord6.setText("record");
                 btnRecord6.setBackgroundResource(R.drawable.ic_play_arrow_black_24dp);
                 tvRecordingTime6.stop();
-                tvRecordingTime6.setVisibility(View.INVISIBLE);
+                stopRecording6();
             }
-            if (getRecordingState(camera7ID)) {
-                mCVBSService.stopVideoRecording(camera7ID);
+            if (isRecording7) {
+                tvRecordingTime7.setVisibility(View.GONE);
+                isRecording7 = false;
+                //btnRecord7.setText("record");
                 btnRecord7.setBackgroundResource(R.drawable.ic_play_arrow_black_24dp);
                 tvRecordingTime7.stop();
-                tvRecordingTime7.setVisibility(View.INVISIBLE);
+                stopRecording7();
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+        stopPreview();
         finish();
     }
 }

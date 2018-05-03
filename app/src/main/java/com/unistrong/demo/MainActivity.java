@@ -5,8 +5,11 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.SystemClock;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -83,6 +86,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+        String deviceID = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+        Log.i("gh0st", "deviceID:" + deviceID);
     }
 
     @Override
@@ -101,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_settings:
-                startActivity(new Intent(MainActivity.this, AllActivity.class));
+                startActivity(new Intent(MainActivity.this, AllActivity2.class));
                 break;
         }
         return super.onOptionsItemSelected(item);
