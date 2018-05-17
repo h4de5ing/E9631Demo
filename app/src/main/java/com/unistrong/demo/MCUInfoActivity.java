@@ -146,9 +146,9 @@ public class MCUInfoActivity extends BaseActivity implements View.OnClickListene
                 break;
             case TGPIO:
                 if (bytes[0] == 0x12) {
-                    updateText("GPIO Radar");
+                    updateText("GPIO Radar " + bytes[1]);
                 } else if (bytes[0] == 0x22) {
-                    updateText("GPIO Mileage");
+                    updateText("GPIO Mileage " + bytes[1]);
                 }
                 break;
         }
