@@ -122,7 +122,6 @@ public class AllActivity2 extends AppCompatActivity implements View.OnClickListe
         initGSM();
         initVolumes();
         updateMCUText();
-
         initSurplus();
     }
 
@@ -147,7 +146,8 @@ public class AllActivity2 extends AppCompatActivity implements View.OnClickListe
     private boolean isSend = false;
 
     private void initMcuTimer() {
-        mMcuTimer = new Timer();
+        sendCommandList();
+ /*       mMcuTimer = new Timer();
         mMcuTimer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -163,7 +163,7 @@ public class AllActivity2 extends AppCompatActivity implements View.OnClickListe
                     updateMCUText();
                 }
             }
-        }, 10000, 2000);
+        }, 10000, 100);*/
     }
 
     private static final String acStatus = "/sys/class/power_supply/ac/present";
@@ -516,10 +516,16 @@ public class AllActivity2 extends AppCompatActivity implements View.OnClickListe
         new Thread(new Runnable() {
             @Override
             public void run() {
-                for (byte[] bytes : list) {
-                    sendCommand(bytes);
-                    SystemClock.sleep(300);
+                while (true) {
+                    for (byte[] bytes : list) {
+                        sendCommand(bytes);
+                        SystemClock.sleep(100);
+                    }
                 }
+                /*for (byte[] bytes : list) {
+                    sendCommand(bytes);
+                    SystemClock.sleep(100);
+                }*/
             }
         }).start();
     }

@@ -7,8 +7,8 @@ android {
         applicationId "com.unistrong.e9631dmeo"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 5
-        versionName "1.4"
+        versionCode 6
+        versionName "1.5"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
@@ -33,4 +33,15 @@ dependencies {
 }
 repositories {
     mavenCentral()
+}
+task app(dependsOn: 'assembleDebug') << {
+    def today = new Date().format('yyyyMMddHHmmss')
+    def id = android.defaultConfig.applicationId
+    def prex = id.substring(id.lastIndexOf(".") + 1)
+    copy {
+        from('build/outputs/apk/debug')
+        into("\\\\192.168.67.13\\Image\\E9631\\Apk\\sdk")
+        include('*.apk')
+        rename('app-', "E9631SDKDemo" + "-V" + android.defaultConfig.versionName + "-" + today + "-")
+    }
 }
