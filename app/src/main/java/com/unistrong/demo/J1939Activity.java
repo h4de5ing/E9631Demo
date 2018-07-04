@@ -88,8 +88,7 @@ public class J1939Activity extends BaseActivity implements View.OnClickListener 
                             break;
                         case TGPIO:
                             break;
-                        case TAccStatus:
-                            break;
+                        //case TAccStatus:                            break;
                     }
                 }
             });

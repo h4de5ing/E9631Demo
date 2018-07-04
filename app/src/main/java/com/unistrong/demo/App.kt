@@ -1,6 +1,8 @@
 package com.unistrong.demo
 
 import android.app.Application
+import android.util.Log
+import android.widget.Toast
 
 class App : Application() {
     companion object {
@@ -11,5 +13,16 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         app = this
+    }
+
+    override fun onLowMemory() {
+        super.onLowMemory()
+        Log.i("gh0st", "onLowMemory")
+        //System.gc()
+    }
+
+    override fun onTrimMemory(level: Int) {
+        super.onTrimMemory(level)
+        Log.i("gh0st", "onTrimMemory：$level")
     }
 }

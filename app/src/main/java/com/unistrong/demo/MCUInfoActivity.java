@@ -140,8 +140,7 @@ public class MCUInfoActivity extends BaseActivity implements View.OnClickListene
             case TChannel:
                 updateText("current channel " + bytes[0]);
                 break;
-            case TAccStatus://Deprecated
-                break;
+            //case TAccStatus://Deprecated                break;
             case TUnknow://undefined data type,maybe error data
                 break;
             case TGPIO:

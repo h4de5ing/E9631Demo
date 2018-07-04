@@ -19,6 +19,7 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:largeHeap="true"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".MainActivity">
@@ -64,6 +65,7 @@
             android:screenOrientation="landscape" />
 
         <service android:name=".cvbsVideo.VideoService" />
+
     </application>
 
 </manifest>

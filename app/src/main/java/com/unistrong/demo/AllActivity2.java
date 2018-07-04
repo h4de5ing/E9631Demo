@@ -8,8 +8,10 @@ import android.hardware.Camera;
 import android.media.AudioManager;
 import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.os.StatFs;
 import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.PhoneStateListener;
@@ -116,11 +118,12 @@ public class AllActivity2 extends AppCompatActivity implements View.OnClickListe
         tvUartInfo.setMovementMethod(new ScrollingMovementMethod());
         openUart();
         initBind();
-        //btnOBDStart.performClick();
         initMcuTimer();
         initGSM();
         initVolumes();
         updateMCUText();
+
+        initSurplus();
     }
 
     private AudioManager mAudioManager;
@@ -137,7 +140,6 @@ public class AllActivity2 extends AppCompatActivity implements View.OnClickListe
     }
 
     private void updateVolumes() {
-        Log.i(TAG, "Current:" + mCurrentVolume);
         tvCurrentVolume.setText("" + mCurrentVolume);
     }
 
@@ -160,7 +162,6 @@ public class AllActivity2 extends AppCompatActivity implements View.OnClickListe
                     isSend = false;
                     updateMCUText();
                 }
-                Log.i(TAG, "电源检测 " + status);
             }
         }, 10000, 2000);
     }
@@ -189,7 +190,6 @@ public class AllActivity2 extends AppCompatActivity implements View.OnClickListe
                 Method method = signalStrengthClass.getMethod("getDbm");
                 method.setAccessible(true);
                 Object object = method.invoke(signalStrength);
-                Log.i("gh0st", "" + object);
                 updateGSM(object.toString() + " Dbm");
             } catch (NoSuchMethodException e) {
                 e.printStackTrace();
@@ -205,7 +205,6 @@ public class AllActivity2 extends AppCompatActivity implements View.OnClickListe
         TelephonyManager manager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         if (manager != null) {
             if (manager.getSimState() == TelephonyManager.SIM_STATE_ABSENT) {
-                Log.i("gh0st", "noSIM");
                 updateGSM("noSIM");
             } else {
                 myPhoneStateListener = new MyPhoneStateListener();
@@ -280,29 +279,74 @@ public class AllActivity2 extends AppCompatActivity implements View.OnClickListe
         initTextureView();
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
+    //每隔10秒检测剩余空间,如果小于200M就停止录像
+    private Timer surplusTimer;
+
+    private void initSurplus() {
+        surplusTimer = new Timer();
+        surplusTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (getStorageSpaceBytes() < 200) {
+                    pauseRecording();
+                    Toast.makeText(AllActivity2.this, "内存不足200M,停止录像", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }, 1000, 10000);
+    }
+
+    public long getStorageSpaceBytes() {
+        try {
+            StatFs stat = new StatFs(Environment.getExternalStorageDirectory().getAbsolutePath());
+            return stat.getAvailableBlocks() * (long) stat.getBlockSize();
+        } catch (Exception e) {
+            Log.e(TAG, "Fail to access external storage", e);
+            return 0;
+        }
+    }
+
+    public void pauseRecording() {
         try {
             if (isRecording6) {
-                //tvRecordingTime6.stop();
-                //tvRecordingTime6.setVisibility(View.GONE);
-                //isRecording6 = false;
-                ////btnRecord6.setText("record");
-                //btnRecord6.setBackgroundResource(R.drawable.ic_play_arrow_black_24dp);
-                //stopRecording6();
+                tvRecordingTime6.stop();
+                tvRecordingTime6.setVisibility(View.GONE);
+                isRecording6 = false;
+                btnRecord6.setBackgroundResource(R.drawable.ic_play_arrow_black_24dp);
+                stopRecording6();
             }
             if (isRecording7) {
-                //tvRecordingTime7.stop();
-                //tvRecordingTime7.setVisibility(View.GONE);
-                //isRecording7 = false;
-                ////btnRecord7.setText("record");
-                //btnRecord7.setBackgroundResource(R.drawable.ic_play_arrow_black_24dp);
-                //stopRecording7();
+                tvRecordingTime7.stop();
+                tvRecordingTime7.setVisibility(View.GONE);
+                isRecording7 = false;
+                btnRecord7.setBackgroundResource(R.drawable.ic_play_arrow_black_24dp);
+                stopRecording7();
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        //try {
+        //    if (isRecording6) {
+        //        tvRecordingTime6.stop();
+        //        tvRecordingTime6.setVisibility(View.GONE);
+        //        isRecording6 = false;
+        //        btnRecord6.setBackgroundResource(R.drawable.ic_play_arrow_black_24dp);
+        //        stopRecording6();
+        //    }
+        //    if (isRecording7) {
+        //        tvRecordingTime7.stop();
+        //        tvRecordingTime7.setVisibility(View.GONE);
+        //        isRecording7 = false;
+        //        btnRecord7.setBackgroundResource(R.drawable.ic_play_arrow_black_24dp);
+        //        stopRecording7();
+        //    }
+        //} catch (Exception e) {
+        //    e.printStackTrace();
+        //}
         stopPreview();
         //closeCamera();
     }
@@ -311,6 +355,12 @@ public class AllActivity2 extends AppCompatActivity implements View.OnClickListe
         try {
             if (mCamera6 == null) {
                 mCamera6 = Camera.open(camera6ID);
+      /*          mCamera6.setPreviewCallback(new Camera.PreviewCallback() {
+                    @Override
+                    public void onPreviewFrame(byte[] bytes, Camera camera) {
+
+                    }
+                });*/
             }
             if (mCamera7 == null) {
                 mCamera7 = Camera.open(camera7ID);
@@ -338,13 +388,14 @@ public class AllActivity2 extends AppCompatActivity implements View.OnClickListe
 
                 @Override
                 public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-
                 }
 
                 @Override
                 public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-                    mCamera6.stopPreview();
-                    //mCamera6.release();
+                    if (surface != null) {
+                        surface.release();
+                        surface = null;
+                    }
                     return true;
                 }
 
@@ -375,9 +426,10 @@ public class AllActivity2 extends AppCompatActivity implements View.OnClickListe
 
                 @Override
                 public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-                    //mCamera7.setPreviewCallback(null);
-                    mCamera7.stopPreview();
-                    //mCamera7.release();
+                    if (surface != null) {
+                        surface.release();
+                        surface = null;
+                    }
                     return true;
                 }
 
@@ -416,9 +468,9 @@ public class AllActivity2 extends AppCompatActivity implements View.OnClickListe
         super.onDestroy();
         //stopPreview();
         closeCamera();
-        //vanManager.closeUart4();
-        //vanManager.closeUart6();
-        //vanManager.closeUart7();
+        vanManager.closeUart4();
+        vanManager.closeUart6();
+        vanManager.closeUart7();
         if (mService != null) {
             try {
                 mService.unbind();
@@ -674,7 +726,6 @@ public class AllActivity2 extends AppCompatActivity implements View.OnClickListe
                         case TDataCan:
                             break;
                         case TDataOBD:
-                            //updateOBDText("we got obd data:" + DataUtils.saveHex2String(bytes));
                             handleOBD(bytes);
                             break;
                         case TDataJ1939:
@@ -683,14 +734,13 @@ public class AllActivity2 extends AppCompatActivity implements View.OnClickListe
                             break;
                         case TGPIO:
                             if (bytes[0] == 0x12) {
-                                mGpio_rada = true;
+                                mGpio_rada = bytes[1] == 0x01;
                             } else if (bytes[0] == 0x22) {
-                                mGpio_mileage = true;
+                                mGpio_mileage = bytes[1] == 0x01;
                             }
                             updateMCUText();
                             break;
-                        case TAccStatus:
-                            break;
+                        //case TAccStatus:                            break;
                     }
                 }
             });
@@ -846,9 +896,8 @@ public class AllActivity2 extends AppCompatActivity implements View.OnClickListe
     private void record6() {
         if (isRecording6) {
             tvRecordingTime6.stop();
-            tvRecordingTime6.setVisibility(View.GONE);
+            tvRecordingTime6.setVisibility(View.INVISIBLE);
             isRecording6 = false;
-            //btnRecord6.setText("record");
             btnRecord6.setBackgroundResource(R.drawable.ic_play_arrow_black_24dp);
             stopRecording6();
         } else {
@@ -857,13 +906,11 @@ public class AllActivity2 extends AppCompatActivity implements View.OnClickListe
                 tvRecordingTime6.setBase(SystemClock.elapsedRealtime());
                 tvRecordingTime6.start();
                 isRecording6 = true;
-                //btnRecord6.setText("stop");
                 btnRecord6.setBackgroundResource(R.drawable.ic_stop_black_24dp);
             } else {
                 tvRecordingTime6.stop();
-                tvRecordingTime6.setVisibility(View.GONE);
+                tvRecordingTime6.setVisibility(View.INVISIBLE);
                 isRecording6 = false;
-                //btnRecord6.setText("record");
                 btnRecord6.setBackgroundResource(R.drawable.ic_play_arrow_black_24dp);
             }
         }
@@ -872,9 +919,8 @@ public class AllActivity2 extends AppCompatActivity implements View.OnClickListe
     private void record7() {
         if (isRecording7) {
             tvRecordingTime7.stop();
-            tvRecordingTime7.setVisibility(View.GONE);
+            tvRecordingTime7.setVisibility(View.INVISIBLE);
             isRecording7 = false;
-            //btnRecord7.setText("record");
             btnRecord7.setBackgroundResource(R.drawable.ic_play_arrow_black_24dp);
             stopRecording7();
         } else {
@@ -883,13 +929,11 @@ public class AllActivity2 extends AppCompatActivity implements View.OnClickListe
                 tvRecordingTime7.setBase(SystemClock.elapsedRealtime());
                 tvRecordingTime7.start();
                 isRecording7 = true;
-                //btnRecord7.setText("stop");
                 btnRecord7.setBackgroundResource(R.drawable.ic_stop_black_24dp);
             } else {
                 tvRecordingTime7.stop();
-                tvRecordingTime7.setVisibility(View.GONE);
+                tvRecordingTime7.setVisibility(View.INVISIBLE);
                 isRecording7 = false;
-                //btnRecord7.setText("record");
                 btnRecord7.setBackgroundResource(R.drawable.ic_play_arrow_black_24dp);
             }
         }
@@ -1009,23 +1053,21 @@ public class AllActivity2 extends AppCompatActivity implements View.OnClickListe
             mCamera7.lock();
         }
     }
-
+/*
     @Override
     public void onBackPressed() {
         super.onBackPressed();
         try {
             if (isRecording6) {
-                tvRecordingTime6.setVisibility(View.GONE);
+                tvRecordingTime6.setVisibility(View.INVISIBLE);
                 isRecording6 = false;
-                //btnRecord6.setText("record");
                 btnRecord6.setBackgroundResource(R.drawable.ic_play_arrow_black_24dp);
                 tvRecordingTime6.stop();
                 stopRecording6();
             }
             if (isRecording7) {
-                tvRecordingTime7.setVisibility(View.GONE);
+                tvRecordingTime7.setVisibility(View.INVISIBLE);
                 isRecording7 = false;
-                //btnRecord7.setText("record");
                 btnRecord7.setBackgroundResource(R.drawable.ic_play_arrow_black_24dp);
                 tvRecordingTime7.stop();
                 stopRecording7();
@@ -1035,5 +1077,5 @@ public class AllActivity2 extends AppCompatActivity implements View.OnClickListe
         }
         stopPreview();
         finish();
-    }
+    }*/
 }

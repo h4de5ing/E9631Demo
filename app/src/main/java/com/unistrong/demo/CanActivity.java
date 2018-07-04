@@ -77,8 +77,7 @@ public class CanActivity extends BaseActivity implements View.OnClickListener {
                             break;
                         case TGPIO:
                             break;
-                        case TAccStatus:
-                            break;
+                        //case TAccStatus:                            break;
                     }
                 }
             });
@@ -133,8 +132,8 @@ public class CanActivity extends BaseActivity implements View.OnClickListener {
                 sendCommand(Command.Send.ModeCan());
                 break;
             case R.id.btn_set_baud:
-                //sendCommand(Command.Send.Switch250K());
-                sendCommand(Command.Send.Switch500K());
+                sendCommand(Command.Send.Switch250K());
+                //sendCommand(Command.Send.Switch500K());
                 break;
             case R.id.btn_send_data:
                    /*byte[] id = new byte[]{0x00, 0x00, 0x00, 0x00};
