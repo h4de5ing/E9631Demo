@@ -3,7 +3,10 @@ package com.unistrong.demo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,6 +21,10 @@ public class CanActivity extends BaseActivity implements View.OnClickListener {
     private TextView mTv;
     private EditText etId;
     private EditText etData;
+    private Spinner mSpFrameFormat;
+    private Spinner mSpFrameType;
+    int frameFormat = 0;
+    int frameType = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,14 +32,49 @@ public class CanActivity extends BaseActivity implements View.OnClickListener {
         setContentView(R.layout.activity_can);
         etId = (EditText) findViewById(R.id.et_id);
         etData = (EditText) findViewById(R.id.et_data);
+        mSpFrameFormat = (Spinner) findViewById(R.id.sp_frame_format);
+        mSpFrameType = (Spinner) findViewById(R.id.sp_frame_type);
         findViewById(R.id.btn_search_channel).setOnClickListener(this);
         findViewById(R.id.btn_set_channel1).setOnClickListener(this);
         findViewById(R.id.btn_set_channel2).setOnClickListener(this);
         findViewById(R.id.btn_search_mode).setOnClickListener(this);
         findViewById(R.id.btn_set_can_mode).setOnClickListener(this);
-        findViewById(R.id.btn_set_baud).setOnClickListener(this);
+        findViewById(R.id.btn_set_baud_250K).setOnClickListener(this);
+        findViewById(R.id.btn_set_baud_500K).setOnClickListener(this);
         findViewById(R.id.btn_send_data).setOnClickListener(this);
         mTv = (TextView) findViewById(R.id.tv_result);
+        findViewById(R.id.btn_clean).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mTv != null) {
+                    mTv.setText("");
+                }
+            }
+        });
+        mSpFrameFormat.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, getResources().getStringArray(R.array.can_format)));
+        mSpFrameType.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, getResources().getStringArray(R.array.can_type)));
+        mSpFrameFormat.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+                frameFormat = position;
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+        mSpFrameType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+                frameType = position;
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
         initBind();
     }
 
@@ -131,19 +173,19 @@ public class CanActivity extends BaseActivity implements View.OnClickListener {
             case R.id.btn_set_can_mode:
                 sendCommand(Command.Send.ModeCan());
                 break;
-            case R.id.btn_set_baud:
+            case R.id.btn_set_baud_250K:
                 sendCommand(Command.Send.Switch250K());
                 //sendCommand(Command.Send.Switch500K());
                 break;
+            case R.id.btn_set_baud_500K:
+                sendCommand(Command.Send.Switch500K());
+                break;
             case R.id.btn_send_data:
-                   /*byte[] id = new byte[]{0x00, 0x00, 0x00, 0x00};
-                byte[] data = new byte[]{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08};
-                sendCanData(id, data);*/
                 String strID = etId.getText().toString();
                 String strData = etData.getText().toString();
                 if (strID.length() % 2 == 0 || strID.length() != 8) {
                     if (strData.length() % 2 == 0 || strData.length() != 16) {
-                        sendCanData(int2byte(strID, 4), int2byte(strData, 8));
+                        testSendCanData(int2byte(strID, 4), int2byte(strData, 8));
                     } else {
                         Toast.makeText(CanActivity.this, "error data", Toast.LENGTH_SHORT).show();
                     }
@@ -152,6 +194,83 @@ public class CanActivity extends BaseActivity implements View.OnClickListener {
                 }
                 break;
         }
+    }
+
+    public void testSendCanData(byte[] id, byte[] data) {
+        sendCanData(canFrame(id, frameFormat, frameType), data);
+    }
+
+    public byte[] canFrame(byte[] id, int frameFormat, int frameType) {
+        Log.i("gh0st", "" + frameFormat + " " + frameType);
+        if (frameFormat == 0) {//11位 数据帧
+            id[1] = (byte) (id[1] & 0xF0);//取前4位
+            id[2] = 0x00;
+            id[3] = 0x00;
+        } else {//扩展数据帧
+            int count = (id[0] & 0xff) << 24 | (id[1] & 0xff) << 16 | (id[2] & 0xff) << 8 | (id[3] & 0xff);
+            int zuoyi = count << 3;
+            String zuoyiBinary = Integer.toBinaryString(zuoyi);
+            String zeroString = "00000000000000000000000000000000";
+            if (zuoyiBinary.length() < 32) {
+                zuoyiBinary = zeroString.substring(0, 32 - zuoyiBinary.length()) + zuoyiBinary;
+            }
+            for (int i = 0; i < id.length; i++) {
+                id[i] = string2byte(getHex(zuoyiBinary.substring(i * 8, (i + 1) * 8)));
+            }
+        }
+        if (frameFormat == 0 && frameType == 0) {//标准数据帧
+            //newId[3] = (byte) (newId[3]);
+        } else if (frameFormat == 1 && frameType == 0) {//扩展数据帧
+            id[3] = (byte) (id[3] | 0x04);
+        } else if (frameFormat == 0 && frameType == 1) {//标准远程帧
+            id[3] = (byte) (id[3] | 0x02);
+        } else if (frameFormat == 1 && frameType == 1) {//扩展远程帧 输入值左移3位 然后 & 000类型
+            id[3] = (byte) (id[3] | 0x06);
+        }
+        return id;
+    }
+
+    public static byte string2byte(String byteString) {
+        byte b = 0;
+        if (byteString.length() == 2) {
+            b = (byte) (Integer.valueOf(byteString.substring(0, 2), 16) & 0xff);
+        }
+        return b;
+    }
+
+    public static String getHex(String binary) {
+        StringBuilder sb = new StringBuilder();
+        int digitNumber = 1;
+        int sum = 0;
+        for (int i = 0; i < binary.length(); i++) {
+            if (digitNumber == 1)
+                sum += Integer.parseInt(binary.charAt(i) + "") * 8;
+            else if (digitNumber == 2)
+                sum += Integer.parseInt(binary.charAt(i) + "") * 4;
+            else if (digitNumber == 3)
+                sum += Integer.parseInt(binary.charAt(i) + "") * 2;
+            else if (digitNumber == 4 || i < binary.length() + 1) {
+                sum += Integer.parseInt(binary.charAt(i) + "") * 1;
+                digitNumber = 0;
+                if (sum < 10)
+                    sb.append(sum);
+                else if (sum == 10)
+                    sb.append("A");
+                else if (sum == 11)
+                    sb.append("B");
+                else if (sum == 12)
+                    sb.append("C");
+                else if (sum == 13)
+                    sb.append("D");
+                else if (sum == 14)
+                    sb.append("E");
+                else if (sum == 15)
+                    sb.append("F");
+                sum = 0;
+            }
+            digitNumber++;
+        }
+        return sb.toString();
     }
 
     public byte[] int2byte(String string, int byteLength) {
@@ -172,5 +291,16 @@ public class CanActivity extends BaseActivity implements View.OnClickListener {
                 e.printStackTrace();
             }
         }
+    }
+
+    public static String saveHex2String(byte[] data) {
+        StringBuilder sb = new StringBuilder(data.length * 2);
+        final char[] HEX = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+                'A', 'B', 'C', 'D', 'E', 'F'};
+        for (int i = 0; i < data.length; i++) {
+            int value = data[i] & 0xff;
+            sb.append(HEX[value / 16]).append(HEX[value % 16]).append(" ");
+        }
+        return sb.toString();
     }
 }

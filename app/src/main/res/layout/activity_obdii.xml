@@ -57,10 +57,15 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/btn_set_baud"
+                android:id="@+id/btn_set_baud_250K"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="3. set baud" />
+                android:text="3.0. set baud 250LK" />
+            <Button
+                android:id="@+id/btn_set_baud_500K"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3.1. set baud 500K" />
 
             <Button
                 android:id="@+id/btn_send_data_start"

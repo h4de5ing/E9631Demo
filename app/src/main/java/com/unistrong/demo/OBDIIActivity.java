@@ -47,7 +47,8 @@ public class OBDIIActivity extends BaseActivity implements View.OnClickListener 
         findViewById(R.id.btn_set_channel2).setOnClickListener(this);
         findViewById(R.id.btn_search_mode).setOnClickListener(this);
         findViewById(R.id.btn_set_obd_mode).setOnClickListener(this);
-        findViewById(R.id.btn_set_baud).setOnClickListener(this);
+        findViewById(R.id.btn_set_baud_250K).setOnClickListener(this);
+        findViewById(R.id.btn_set_baud_500K).setOnClickListener(this);
         findViewById(R.id.btn_send_data_start).setOnClickListener(this);
         findViewById(R.id.btn_send_data_pidlist).setOnClickListener(this);
         findViewById(R.id.btn_send_data_pid).setOnClickListener(this);
@@ -151,9 +152,11 @@ public class OBDIIActivity extends BaseActivity implements View.OnClickListener 
             case R.id.btn_set_obd_mode:
                 sendCommand(Command.Send.ModeOBD());
                 break;
-            case R.id.btn_set_baud:
+            case R.id.btn_set_baud_250K:
                 sendCommand(Command.Send.Switch250K());
-                //sendCommand(Command.Send.Switch500K());
+                break;
+            case R.id.btn_set_baud_500K:
+                sendCommand(Command.Send.Switch500K());
                 break;
             case R.id.btn_send_data_start:
                 byte[] start11 = new byte[]{0x01, 0x07, (byte) 0xDF, 0x00, 0x00, 0x02, 0x01, 0x00};//ISO15756 500K 11bit
