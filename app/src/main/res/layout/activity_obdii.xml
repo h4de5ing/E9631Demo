@@ -60,7 +60,8 @@
                 android:id="@+id/btn_set_baud_250K"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="3.0. set baud 250LK" />
+                android:text="3.0. set baud 250K" />
+
             <Button
                 android:id="@+id/btn_set_baud_500K"
                 android:layout_width="wrap_content"
@@ -84,6 +85,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="6. get pid value" />
+
+            <CheckBox
+                android:id="@+id/cb_filter"
+                android:layout_width="wrap_content"
+                android:checked="true"
+                android:layout_height="wrap_content"
+                android:text="Filter" />
         </LinearLayout>
     </LinearLayout>
 

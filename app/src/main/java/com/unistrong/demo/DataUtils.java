@@ -15,6 +15,16 @@ public class DataUtils {
         return sb.toString();
     }
 
+    public static String saveHex2StringNoSpace(byte[] data) {
+        StringBuilder sb = new StringBuilder(data.length * 2);
+        char[] HEX = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+        for (byte aData : data) {
+            int value = aData & 0xff;
+            sb.append(HEX[value / 16]).append(HEX[value % 16]);
+        }
+        return sb.toString();
+    }
+
     public static String byte2String(byte data) {
         StringBuilder sb = new StringBuilder();
         final char[] HEX = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
@@ -23,6 +33,7 @@ public class DataUtils {
         sb.append(HEX[value / 16]).append(HEX[value % 16]).append(" ");
         return sb.toString().trim();
     }
+
     public static byte string2byte(String byteString) {
         byte b = 0;
         if (byteString.length() == 2) {
@@ -30,6 +41,7 @@ public class DataUtils {
         }
         return b;
     }
+
     public static byte[] cutByteArray(byte[] data, int start, int stop) {
         byte[] newData = null;
         if (data != null && data.length > 0 && stop <= data.length && stop - start > 0) {

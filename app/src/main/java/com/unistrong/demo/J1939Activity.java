@@ -3,6 +3,8 @@ package com.unistrong.demo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.unistrong.e9631sdk.Command;
@@ -30,6 +32,7 @@ public class J1939Activity extends BaseActivity implements View.OnClickListener 
     private static final String TAG = "unistrong";
     private CommunicationService mService;
     private TextView mTv;
+    private byte mFilter = 0x01;//0x01 过滤  0x00 不过滤
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +45,15 @@ public class J1939Activity extends BaseActivity implements View.OnClickListener 
         findViewById(R.id.btn_set_j1939_mode).setOnClickListener(this);
         findViewById(R.id.btn_set_baud).setOnClickListener(this);
         findViewById(R.id.btn_send_data).setOnClickListener(this);
+        findViewById(R.id.btn_clean).setOnClickListener(this);
         mTv = (TextView) findViewById(R.id.tv_result);
+        CheckBox filter = (CheckBox) findViewById(R.id.cb_filter);
+        filter.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                mFilter = (byte) (isChecked ? 0x01 : 0x00);
+            }
+        });
         initBind();
     }
 
@@ -88,7 +99,6 @@ public class J1939Activity extends BaseActivity implements View.OnClickListener 
                             break;
                         case TGPIO:
                             break;
-                        //case TAccStatus:                            break;
                     }
                 }
             });
@@ -158,6 +168,9 @@ public class J1939Activity extends BaseActivity implements View.OnClickListener 
                 sendCommand(Command.Send.Switch250K());
                 //sendCommand(Command.Send.Switch500K());
                 break;
+            case R.id.btn_clean:
+                mTv.setText("");
+                break;
             case R.id.btn_send_data:
                 //参考文档
                 int pgn = 61440;
@@ -167,7 +180,7 @@ public class J1939Activity extends BaseActivity implements View.OnClickListener 
                     String newStr = "0000".subSequence(0, 4 - strPgn.length()).toString();
                     strPgn = newStr + strPgn;
                 }//TODO int pgn to hex
-                byte[] data = new byte[]{0x01, (byte) 0xF9, 0x06, 0x00, (byte) 0xEA, 0x00, (byte) 0xDC, (byte) 0xFE, 0x00};
+                byte[] data = new byte[]{mFilter, (byte) 0xF9, 0x06, 0x00, (byte) 0xEA, 0x00, (byte) 0xDC, (byte) 0xFE, 0x00};
                 sendJ1939Data(data);
                 break;
         }

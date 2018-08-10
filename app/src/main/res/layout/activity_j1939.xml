@@ -57,11 +57,29 @@
             android:layout_height="wrap_content"
             android:text="3. set j1939 baud" />
 
-        <Button
-            android:id="@+id/btn_send_data"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="4. send data" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/btn_send_data"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="4. send data" />
+
+            <Button
+                android:id="@+id/btn_clean"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="clean" />
+
+            <CheckBox
+                android:id="@+id/cb_filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="filter" />
+        </LinearLayout>
     </LinearLayout>
 
     <TextView
@@ -69,5 +87,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/ll_btn"
+        android:scrollbars="vertical"
         tools:text="tools" />
 </RelativeLayout>

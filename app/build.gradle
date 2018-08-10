@@ -7,8 +7,8 @@ android {
         applicationId "com.unistrong.e9631dmeo"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 7
-        versionName "1.6"
+        versionCode 8
+        versionName "1.7"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
@@ -18,18 +18,22 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
+/*   sourceSets {
+        main.java.srcDirs += '../../CarLib/e9631sdk/src/main/java'
+    }*/
 }
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:23.0.0'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
-    implementation files('libs/e9631_can_sdk_v1.0.jar')
-    //implementation files('libs/uartsdk_v1.0.jar')
     implementation 'com.android.support:design:23.0.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation project(':uartsdk')
+    //implementation files('libs/e9631_can_sdk_v1.0.jar')
+    //implementation files('libs/e9631_can_sdk_v1.1.jar')
+    //implementation files('libs/uartsdk_v1.0.jar')
+    implementation files('libs/e9631_can_sdk_v1.2.jar')
 }
 repositories {
     mavenCentral()

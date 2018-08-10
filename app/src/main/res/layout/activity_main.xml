@@ -32,7 +32,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="J1939" />
+            android:text="OBDII(J1939)" />
     </LinearLayout>
 
     <LinearLayout

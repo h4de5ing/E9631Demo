@@ -242,3 +242,8 @@ closeUart7();//close serial port /dev/ttyS7
 # Issues
 [issues](https://github.com/h4de5ing/E9631Demo/issues)
 email:moxi1992@gmail.com
+
+update log
+e9631_can_sdk_v1.2.jar
+1.add can id filter/cancel filter
+2.obd filter/j1939filter

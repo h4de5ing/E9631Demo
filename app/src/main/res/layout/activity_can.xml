@@ -94,6 +94,7 @@
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:hint="can id"
+                android:digits="@string/canid"
                 android:text="00000000" />
 
             <EditText
@@ -114,6 +115,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="clean" />
+            <Button
+                android:id="@+id/btn_filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="filter" />
+            <Button
+                android:id="@+id/btn_filter_cancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="cancel filter" />
         </LinearLayout>
     </LinearLayout>
 

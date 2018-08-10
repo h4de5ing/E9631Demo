@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.unistrong.e9631sdk.Command;
@@ -25,7 +27,7 @@ import com.unistrong.e9631sdk.DataType;
  * 2.查询协议模式，如果不是obd模式，设置obd模式
  * 3.设置can设备的通信波特率
  * 4.发送开始指令，获得汽车的ECU并选择对应的ECU
- * 5.发送PID查询指令到对于的ECU
+ * 5.发送PID查询指令到对应的ECU
  * 6.解析对应ECU所支持的PID列表
  * 7.发送支持的PID指令
  * 8.解析PID值
@@ -35,7 +37,7 @@ public class OBDIIActivity extends BaseActivity implements View.OnClickListener 
     private CommunicationService mService;
     private TextView mTv;
     private byte ECUType = (byte) 0xDF;
-
+    private byte mFilter = 0x01;//0x01 过滤  0x00 不过滤
     private Handler mHandler = new Handler();
 
     @Override
@@ -53,6 +55,13 @@ public class OBDIIActivity extends BaseActivity implements View.OnClickListener 
         findViewById(R.id.btn_send_data_pidlist).setOnClickListener(this);
         findViewById(R.id.btn_send_data_pid).setOnClickListener(this);
         mTv = (TextView) findViewById(R.id.tv_result);
+        CheckBox filter = (CheckBox) findViewById(R.id.cb_filter);
+        filter.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                mFilter = (byte) (isChecked ? 0x01 : 0x00);
+            }
+        });
         initBind();
     }
 
@@ -159,7 +168,7 @@ public class OBDIIActivity extends BaseActivity implements View.OnClickListener 
                 sendCommand(Command.Send.Switch500K());
                 break;
             case R.id.btn_send_data_start:
-                byte[] start11 = new byte[]{0x01, 0x07, (byte) 0xDF, 0x00, 0x00, 0x02, 0x01, 0x00};//ISO15756 500K 11bit
+                byte[] start11 = new byte[]{mFilter, 0x07, (byte) 0xDF, 0x00, 0x00, 0x02, 0x01, 0x00};//ISO15756 500K 11bit
                 //byte[] start29 = new byte[]{0x01, 0x18, (byte) 0xDB, 0x33, (byte) 0xF5, 0x02, 0x01, 0x00};//ISO15765 500K 29bit
                 sendOBDData(start11);
                 isStart = true;
@@ -171,15 +180,15 @@ public class OBDIIActivity extends BaseActivity implements View.OnClickListener 
                 }, 3000);
                 break;
             case R.id.btn_send_data_pidlist://get support pid
-                sendOBDData(new byte[]{0x01, 0x07, ECUType, 0x00, 0x00, 0x02, 0x01, 0x00});
+                sendOBDData(new byte[]{mFilter, 0x07, ECUType, 0x00, 0x00, 0x02, 0x01, 0x00});
 
-                sendOBDData(new byte[]{0x01, 0x07, ECUType, 0x00, 0x00, 0x02, 0x01, 0x20});
+                sendOBDData(new byte[]{mFilter, 0x07, ECUType, 0x00, 0x00, 0x02, 0x01, 0x20});
 
-                sendOBDData(new byte[]{0x01, 0x07, ECUType, 0x00, 0x00, 0x02, 0x01, 0x40});
+                sendOBDData(new byte[]{mFilter, 0x07, ECUType, 0x00, 0x00, 0x02, 0x01, 0x40});
                 break;
             case R.id.btn_send_data_pid://get  Vehicle speed
                 byte pid = 0x0D;//0x0D  Vehicle speed
-                sendOBDData(new byte[]{0x01, 0x07, ECUType, 0x00, 0x00, 0x02, 0x01, pid});
+                sendOBDData(new byte[]{mFilter, 0x07, ECUType, 0x00, 0x00, 0x02, 0x01, pid});
                 break;
         }
     }
