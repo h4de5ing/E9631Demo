@@ -208,8 +208,10 @@ public class CanActivity extends BaseActivity implements View.OnClickListener {
                  *
                  过滤id格式  9个字节
                  第一个字节表示数据类型：
-                 0x01 扩展id
-                 0x00 标准id
+                 0x00 标准数据帧
+                 0x02 标准远程帧
+                 0x04 扩展数据帧
+                 0x06 扩展远程帧
                  后面  发送数据 01 31 43 37 37 37 32 58 58
                  8个字节是过滤id的字符串
                  1C7772XX
@@ -217,16 +219,19 @@ public class CanActivity extends BaseActivity implements View.OnClickListener {
                  例如过滤扩展数据帧 1C7772XX
                  */
                 String strFilterID = etId.getText().toString().trim().toUpperCase();
-           /*     if (frameFormat == 0) {//标准帧 11位
-                    if (!strFilterID.toUpperCase().contains("X")) {//不包含通配符X
-
-
-                    }
-                }*/
                 byte[] id = strFilterID.getBytes();
                 byte[] extendid = new byte[id.length + 1];
                 System.arraycopy(id, 0, extendid, 1, id.length);
-                extendid[0] = (byte) (frameFormat == 1 ? 0x01 : 0x00);//1 扩展 0 标准
+                //extendid[0] = (byte) (frameFormat == 1 ? 0x01 : 0x00);//1 扩展 0 标准
+                if (frameFormat == 0 && frameType == 0) {//标准数据帧
+                    extendid[0] = (byte) 0x00;
+                } else if (frameFormat == 0 && frameType == 1) {//标准远程帧
+                    extendid[0] = (byte) 0x02;
+                } else if (frameFormat == 1 && frameType == 0) {//扩展数据帧
+                    extendid[0] = (byte) 0x04;
+                } else if (frameFormat == 1 && frameType == 1) {//扩展远程帧
+                    extendid[0] = (byte) 0x06;
+                }
                 sendCommand(Command.Send.filterCan(extendid));
                 filterStr = strFilterID;
                 break;

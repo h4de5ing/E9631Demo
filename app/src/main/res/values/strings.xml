@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">E9631SDKDemo</string>
     <string name="canid">0123456789ABCDEFXabcdefx</string>
+    <string name="j1939_pgn_input_type">0123456789abcdefABCDEF</string>
     <string name="title_activity_all">AllFunction</string>
     <string name="action_settings">All</string>
     <string name="in_view">visible:</string>

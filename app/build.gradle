@@ -7,8 +7,8 @@ android {
         applicationId "com.unistrong.e9631dmeo"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 8
-        versionName "1.7"
+        versionCode 9
+        versionName "1.8"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
@@ -33,7 +33,7 @@ dependencies {
     //implementation files('libs/e9631_can_sdk_v1.0.jar')
     //implementation files('libs/e9631_can_sdk_v1.1.jar')
     //implementation files('libs/uartsdk_v1.0.jar')
-    implementation files('libs/e9631_can_sdk_v1.2.jar')
+    implementation files('libs/e9631_can_sdk_v1.3.jar')
 }
 repositories {
     mavenCentral()

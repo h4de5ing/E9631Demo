@@ -5,30 +5,28 @@ package com.unistrong.demo;
  */
 
 public class DataUtils {
-    public static String saveHex2String(byte[] data) {
-        StringBuilder sb = new StringBuilder(data.length * 2);
-        char[] HEX = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
-        for (byte aData : data) {
-            int value = aData & 0xff;
-            sb.append(HEX[value / 16]).append(HEX[value % 16]).append(" ");
-        }
-        return sb.toString();
-    }
+    public static char[] HEX = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
+    public static String saveHex2String(byte[] data) {
+        return byteArray2String(data, data.length, true);
+    }
     public static String saveHex2StringNoSpace(byte[] data) {
-        StringBuilder sb = new StringBuilder(data.length * 2);
-        char[] HEX = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
-        for (byte aData : data) {
-            int value = aData & 0xff;
+        return byteArray2String(data, data.length, false);
+    }
+    public static String byteArray2String(byte[] data, int length, boolean hasSpace) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            int value = data[i] & 0xff;
             sb.append(HEX[value / 16]).append(HEX[value % 16]);
+            if (hasSpace) {
+                sb.append(" ");
+            }
         }
         return sb.toString();
     }
 
     public static String byte2String(byte data) {
         StringBuilder sb = new StringBuilder();
-        final char[] HEX = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-                'A', 'B', 'C', 'D', 'E', 'F'};
         int value = data & 0xff;
         sb.append(HEX[value / 16]).append(HEX[value % 16]).append(" ");
         return sb.toString().trim();

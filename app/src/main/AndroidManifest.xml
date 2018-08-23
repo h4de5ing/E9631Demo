@@ -40,6 +40,7 @@
         <activity
             android:name=".J1939Activity"
             android:label="J1939"
+            android:windowSoftInputMode="adjustNothing"
             android:screenOrientation="landscape" />
         <activity
             android:name=".MCUInfoActivity"

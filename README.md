@@ -243,7 +243,22 @@ closeUart7();//close serial port /dev/ttyS7
 [issues](https://github.com/h4de5ing/E9631Demo/issues)
 email:moxi1992@gmail.com
 
+```
 update log
 e9631_can_sdk_v1.2.jar
 1.add can id filter/cancel filter
 2.obd filter/j1939filter
+
+e9631_can_sdk_v1.3.jar
+
+
+app log
+1.7 ->  last MCU version 2.12
+ can id filter
+
+1.8 -> last MCU version 2.13
+ filter can id
+ filter j1939 pgn
+ multiple filter max 10
+
+ ```

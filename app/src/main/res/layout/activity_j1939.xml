@@ -49,13 +49,146 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="set J1939 mode" />
+
+            <Button
+                android:id="@+id/btn_set_baud"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3. set j1939 baud" />
         </LinearLayout>
 
-        <Button
-            android:id="@+id/btn_set_baud"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="3. set j1939 baud" />
+            android:layout_marginTop="5dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="priority:" />
+
+            <Spinner
+                android:id="@+id/sp_priority"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="100dp"
+                android:layout_height="wrap_content">
+
+
+                <EditText
+                    android:id="@+id/et_dst"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:digits="@string/j1939_pgn_input_type"
+                    android:hint="Dst(Hex)"
+                    android:maxLength="2"
+                    android:text="00" />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="100dp"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/et_pgn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:digits="@string/j1939_pgn_input_type"
+                    android:hint="filter PGN(Hex)"
+                    android:maxLength="4"
+                    android:text="FEDC" />
+            </android.support.design.widget.TextInputLayout>
+
+            <Button
+                android:id="@+id/btn_filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="filter" />
+
+            <Button
+                android:id="@+id/btn_filter_cancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="filter cancel" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Dlc:"
+                android:visibility="gone" />
+
+            <Spinner
+                android:id="@+id/sp_dlc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
+
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="100dp"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/et_src"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:digits="@string/j1939_pgn_input_type"
+                    android:hint="Src(Hex)"
+                    android:maxLength="2"
+                    android:text="F9" />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="100dp"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/et_pf"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:digits="@string/j1939_pgn_input_type"
+                    android:hint="PF(Hex)"
+                    android:maxLength="2"
+                    android:text="EA" />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="100dp"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/et_ps"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:digits="@string/j1939_pgn_input_type"
+                    android:hint="PS(Hex)"
+                    android:maxLength="2"
+                    android:text="00" />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="230dp"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/et_data"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Data(Hex) 0..7"
+                    android:maxLength="16"
+                    android:text="DCFE" />
+            </android.support.design.widget.TextInputLayout>
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -77,7 +210,8 @@
                 android:id="@+id/cb_filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:checked="true"
+                android:checked="false"
+                android:visibility="gone"
                 android:text="filter" />
         </LinearLayout>
     </LinearLayout>

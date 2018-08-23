@@ -14,15 +14,4 @@ class App : Application() {
         super.onCreate()
         app = this
     }
-
-    override fun onLowMemory() {
-        super.onLowMemory()
-        Log.i("gh0st", "onLowMemory")
-        //System.gc()
-    }
-
-    override fun onTrimMemory(level: Int) {
-        super.onTrimMemory(level)
-        Log.i("gh0st", "onTrimMemory：$level")
-    }
 }
