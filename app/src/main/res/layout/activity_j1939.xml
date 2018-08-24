@@ -93,7 +93,7 @@
                 android:layout_height="wrap_content">
 
                 <EditText
-                    android:id="@+id/et_pgn"
+                    android:id="@+id/et_filter_pgn"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:digits="@string/j1939_pgn_input_type"
@@ -211,16 +211,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="false"
-                android:visibility="gone"
-                android:text="filter" />
+                android:text="filter"
+                android:visibility="gone" />
         </LinearLayout>
     </LinearLayout>
 
     <TextView
         android:id="@+id/tv_result"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/ll_btn"
+        android:layout_width="230dp"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
         android:scrollbars="vertical"
         tools:text="tools" />
 </RelativeLayout>

@@ -178,4 +178,38 @@ public class J1939Utils {
         }
         return intId & 0x0004;
     }
+    public static String getHex(String binary) {
+        StringBuilder sb = new StringBuilder();
+        int digitNumber = 1;
+        int sum = 0;
+        for (int i = 0; i < binary.length(); i++) {
+            if (digitNumber == 1)
+                sum += Integer.parseInt(binary.charAt(i) + "") * 8;
+            else if (digitNumber == 2)
+                sum += Integer.parseInt(binary.charAt(i) + "") * 4;
+            else if (digitNumber == 3)
+                sum += Integer.parseInt(binary.charAt(i) + "") * 2;
+            else if (digitNumber == 4 || i < binary.length() + 1) {
+                sum += Integer.parseInt(binary.charAt(i) + "") * 1;
+                digitNumber = 0;
+                if (sum < 10)
+                    sb.append(sum);
+                else if (sum == 10)
+                    sb.append("A");
+                else if (sum == 11)
+                    sb.append("B");
+                else if (sum == 12)
+                    sb.append("C");
+                else if (sum == 13)
+                    sb.append("D");
+                else if (sum == 14)
+                    sb.append("E");
+                else if (sum == 15)
+                    sb.append("F");
+                sum = 0;
+            }
+            digitNumber++;
+        }
+        return sb.toString();
+    }
 }

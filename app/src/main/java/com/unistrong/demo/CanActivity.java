@@ -10,6 +10,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.unistrong.demo.utils.J1939Utils;
 import com.unistrong.e9631sdk.Command;
 import com.unistrong.e9631sdk.CommunicationService;
 import com.unistrong.e9631sdk.DataType;
@@ -122,7 +123,7 @@ public class CanActivity extends BaseActivity implements View.OnClickListener {
                         case TGPIO:
                             break;
                         case TFilter:
-                            updateText((frameFormat == 0 ? "standard id" : "extend id") + " filter " + (bytes[0] == 0x01 ? "success" : " failed"));
+                            updateText((frameFormat == 0 ? "standard id" : "extend id") + " filter " + (bytes[0] > 0 ? "success " + J1939Utils.byte2int(bytes[0]) : " failed"));////bytes[0] 表示过滤的个数
                             break;
                         case TCancelFilter:
                             updateText("can id cancel filter " + (bytes[0] == 0x01 ? "success" : " failed"));
@@ -263,14 +264,14 @@ public class CanActivity extends BaseActivity implements View.OnClickListener {
             id[3] = 0x00;
         } else {//扩展数据帧
             int count = (id[0] & 0xff) << 24 | (id[1] & 0xff) << 16 | (id[2] & 0xff) << 8 | (id[3] & 0xff);
-            int zuoyi = count << 3;
-            String zuoyiBinary = Integer.toBinaryString(zuoyi);
+            int shlInt = count << 3;
+            String shlBinary = Integer.toBinaryString(shlInt);
             String zeroString = "00000000000000000000000000000000";
-            if (zuoyiBinary.length() < 32) {
-                zuoyiBinary = zeroString.substring(0, 32 - zuoyiBinary.length()) + zuoyiBinary;
+            if (shlBinary.length() < 32) {
+                shlBinary = zeroString.substring(0, 32 - shlBinary.length()) + shlBinary;
             }
             for (int i = 0; i < id.length; i++) {
-                id[i] = string2byte(getHex(zuoyiBinary.substring(i * 8, (i + 1) * 8)));
+                id[i] = string2byte(getHex(shlBinary.substring(i * 8, (i + 1) * 8)));
             }
         }
         if (frameFormat == 0 && frameType == 0) {//标准数据帧
