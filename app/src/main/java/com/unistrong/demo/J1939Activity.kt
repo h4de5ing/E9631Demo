@@ -93,6 +93,7 @@ class J1939Activity : BaseActivity(), View.OnClickListener, TextWatcher {
         mHandle.postDelayed({ sendCommand(Command.Send.Channel1()) }, 100)
         mHandle.postDelayed({ sendCommand(Command.Send.ModeJ1939()) }, 200)
         mHandle.postDelayed({ sendCommand(Command.Send.Switch250K()) }, 300)
+        mHandle.postDelayed({ sendCommand(Command.Send.cancelFilterCan()) }, 400)
         mEtFilterPgn!!.addTextChangedListener(this)
         val json = SPUtils.getSp(this@J1939Activity, "filterList", "").toString()
         try {
