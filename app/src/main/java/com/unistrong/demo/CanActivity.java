@@ -40,6 +40,7 @@ public class CanActivity extends BaseActivity implements View.OnClickListener {
         findViewById(R.id.btn_set_channel2).setOnClickListener(this);
         findViewById(R.id.btn_search_mode).setOnClickListener(this);
         findViewById(R.id.btn_set_can_mode).setOnClickListener(this);
+        findViewById(R.id.btn_set_baud_125K).setOnClickListener(this);
         findViewById(R.id.btn_set_baud_250K).setOnClickListener(this);
         findViewById(R.id.btn_set_baud_500K).setOnClickListener(this);
         findViewById(R.id.btn_send_data).setOnClickListener(this);
@@ -99,6 +100,9 @@ public class CanActivity extends BaseActivity implements View.OnClickListener {
                             break;
                         case TMcuVoltage:
                             break;
+                        case TCan125:
+                            updateText("can 125K set success");
+                            break;
                         case TCan250:
                             updateText("can 250K set success");
                             break;
@@ -116,7 +120,7 @@ public class CanActivity extends BaseActivity implements View.OnClickListener {
                             updateText("current mode " + DataUtils.getDataMode(bytes[0]));
                             break;
                         case TDataCan:
-                            updateText("we got can data:" + DataUtils.saveHex2String(bytes));
+                            handleCanData(bytes);
                             break;
                         case TUnknow:
                             break;
@@ -133,6 +137,17 @@ public class CanActivity extends BaseActivity implements View.OnClickListener {
             });
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private void handleCanData(byte[] data) {
+        switch (data[0]) {
+            case 0x01:
+                updateText("we got can channel 1 data:" + DataUtils.saveHex2String(data));
+                break;
+            case 0x02:
+                updateText("we got can channel 2 data:" + DataUtils.saveHex2String(data));
+                break;
         }
     }
 
@@ -180,6 +195,9 @@ public class CanActivity extends BaseActivity implements View.OnClickListener {
                 break;
             case R.id.btn_set_can_mode:
                 sendCommand(Command.Send.ModeCan());
+                break;
+            case R.id.btn_set_baud_125K:
+                sendCommand(Command.Send.Switch125K());
                 break;
             case R.id.btn_set_baud_250K:
                 sendCommand(Command.Send.Switch250K());

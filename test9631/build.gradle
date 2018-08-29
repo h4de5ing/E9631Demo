@@ -1,0 +1,40 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+android {
+    compileSdkVersion 27
+    defaultConfig {
+        applicationId "com.unistrong.uarttest"
+        minSdkVersion 15
+        targetSdkVersion 27
+        versionCode 5
+        versionName "1.6"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:0.21' //kotlin async
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support:design:27.1.1'
+}
+task appTest9631(dependsOn: 'assembleDebug') << {
+    def today = new Date().format('yyyyMMddHHmmss')
+    def id = android.defaultConfig.applicationId
+    def prex = id.substring(id.lastIndexOf(".") + 1)
+    copy {
+        from('build/outputs/apk/debug')
+        into("\\\\192.168.67.13\\Image\\E9631\\Apk\\last_version")
+        include('*.apk')
+        rename('app-', "$prex" + "-V" + android.defaultConfig.versionName + "-" + today + "-")
+    }
+}

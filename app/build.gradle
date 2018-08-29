@@ -8,7 +8,7 @@ android {
         minSdkVersion 15
         targetSdkVersion 23
         versionCode 9
-        versionName "1.8"
+        versionName "1.9"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
@@ -30,10 +30,8 @@ dependencies {
     implementation 'com.android.support:design:23.0.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation project(':uartsdk')
-    //implementation files('libs/e9631_can_sdk_v1.0.jar')
-    //implementation files('libs/e9631_can_sdk_v1.1.jar')
     //implementation files('libs/uartsdk_v1.0.jar')
-    implementation files('libs/e9631_can_sdk_v1.3.jar')
+    implementation files('libs/e9631_can_sdk_v1.4.jar')
 }
 repositories {
     mavenCentral()

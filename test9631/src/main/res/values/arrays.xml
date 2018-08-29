@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="can_format">
+        <item>standard</item>
+        <item>extend</item>
+    </string-array>
+    <string-array name="can_type">
+        <item>data</item>
+        <item>remote</item>
+    </string-array>
+    <string-array name="can_baud">
+        <item>500 kBit/s</item>
+        <item>250 kBit/s</item>
+    </string-array>
+    <string-array name="can_channel">
+        <item>channel 1</item>
+        <item>channel 2</item>
+    </string-array>
+    <string-array name="uart_name">
+        <item>ttyS4</item>
+        <item>ttyS6</item>
+    </string-array>
+    <string-array name="uart_baud">
+        <item>57600</item>
+        <item>115200</item>
+        <item>230400</item>
+        <item>460800</item>
+        <item>500000</item>
+        <item>576000</item>
+        <item>921600</item>
+    </string-array>
+</resources>

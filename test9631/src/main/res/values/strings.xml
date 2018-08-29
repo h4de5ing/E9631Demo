@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">E9631压力测试</string>
+    <string name="action_settings">设置</string>
+    <string name="activity_name_can">Can压力测试</string>
+    <string name="activity_name_uart">串口压力测试</string>
+    <string name="data">Data:</string>
+    <string name="send_count">发送总数</string>
+    <string name="send_cycle">发送周期</string>
+    <string name="data_inc">数据递增</string>
+    <string name="show_hex">十六进制</string>
+    <string name="not_show">回显</string>
+    <string name="send">发送</string>
+    <string name="clean">清空</string>
+    <string name="clean_count">清空计数</string>
+    <string name="stop">停止</string>
+    <string name="open">打开</string>
+    <string name="close">关闭</string>
+    <string name="number">0123456789</string>
+    <string name="can_input_type">0123456789abcdefABCDEF </string>
+    <string name="input_type_hexletter">0123456789ABCDEFabcdef</string>
+    <string name="input_type_letter">0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz</string>
+</resources>

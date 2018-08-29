@@ -250,6 +250,10 @@ e9631_can_sdk_v1.2.jar
 2.obd filter/j1939filter
 
 e9631_can_sdk_v1.3.jar
+1. replace activity context in Context
+
+e9631_can_sdk_v1.4.jar
+1.add can baud 125k(just can mode)
 
 
 app log
@@ -260,5 +264,8 @@ app log
  filter can id
  filter j1939 pgn
  multiple filter max 10
+
+ 1.9 -> last MCU version 2.16
+ e9631_can_sdk_v1.4.jar
 
  ```

@@ -58,6 +58,12 @@
             android:orientation="horizontal">
 
             <Button
+                android:id="@+id/btn_set_baud_125K"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3. set baud 125K" />
+
+            <Button
                 android:id="@+id/btn_set_baud_250K"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -93,8 +99,8 @@
                 android:id="@+id/et_id"
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
-                android:hint="can id"
                 android:digits="@string/canid"
+                android:hint="can id"
                 android:text="00000000" />
 
             <EditText
@@ -115,11 +121,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="clean" />
+
             <Button
                 android:id="@+id/btn_filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="filter" />
+
             <Button
                 android:id="@+id/btn_filter_cancel"
                 android:layout_width="wrap_content"

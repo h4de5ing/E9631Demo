@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:key="car_setting"
+        android:title="@string/action_settings">
+        <EditTextPreference
+            android:defaultValue="300"
+            android:inputType="number"
+            android:key="edittext_preference_send_cycle"
+            android:maxLength="5"
+            android:summary="can和串口数据发送的间隔"
+            android:title="数据发送周期" />
+        <EditTextPreference
+            android:defaultValue="300"
+            android:inputType="number"
+            android:key="edittext_preference_send_count"
+            android:maxLength="5"
+            android:summary="can或串口数据发送的数据总和"
+            android:title="数据总数" />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="checkbox_preference_hex"
+            android:title="Hex显示" />
+    </PreferenceCategory>
+
+</PreferenceScreen>
