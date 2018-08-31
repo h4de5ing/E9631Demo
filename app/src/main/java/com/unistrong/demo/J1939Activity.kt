@@ -162,27 +162,27 @@ class J1939Activity : BaseActivity(), View.OnClickListener, TextWatcher {
      * 3.判断是不是PGN应答 如果是PGN应答输出
      */
     private fun handleJ1939(bytes: ByteArray) {
-        updateText(J1939Utils.saveHex2String(bytes))
-        val id = ByteArray(4)
-        System.arraycopy(bytes, 1, id, 0, id.size)
-        val last = J1939Utils.byte2int(bytes[id.size])
-        if ((last == 0x04) or (last == 0x06)) {
-            val byte0 = J1939Utils.byte2int(id[0])
-            val byte1 = J1939Utils.byte2int(id[1])
-            val byte2 = J1939Utils.byte2int(id[2])
-            val byte3 = J1939Utils.byte2int(id[3])
-            val count = ((byte0 and 0xff) shl 24) or ((byte1 and 0xff) shl 16) or ((byte2 and 0xff) shl 8) or (byte3 and 0xff)
-            var ushrInt = count ushr 3
-            val zeroString = "00000000000000000000000000000000"//4个字节 总共32位
-            var ushrBinary = Integer.toBinaryString(ushrInt)
-            if (ushrBinary.length < 32) {
-                ushrBinary = zeroString.substring(0, 32 - ushrBinary.length) + ushrBinary
-            }
-            for (i in id.indices) {
-                id[i] = J1939Utils.string2byte(J1939Utils.getHex(ushrBinary.substring(i * 8, (i + 1) * 8)))
-            }
-            updateText("received -> ID[0x${DataUtils.saveHex2StringNoSpace(id)}] ${if (last == 0x04) "data[x|${DataUtils.saveHex2String(DataUtils.cutByteArray(bytes, 5, bytes.size))}]" else ""}")
-        }
+        updateText("rev:" + J1939Utils.saveHex2String(bytes))
+        /*   val id = ByteArray(4)
+          System.arraycopy(bytes, 1, id, 0, id.size)
+          val last = J1939Utils.byte2int(bytes[id.size])
+          if ((last == 0x04) or (last == 0x06)) {
+              val byte0 = J1939Utils.byte2int(id[0])
+              val byte1 = J1939Utils.byte2int(id[1])
+              val byte2 = J1939Utils.byte2int(id[2])
+              val byte3 = J1939Utils.byte2int(id[3])
+              val count = ((byte0 and 0xff) shl 24) or ((byte1 and 0xff) shl 16) or ((byte2 and 0xff) shl 8) or (byte3 and 0xff)
+              var ushrInt = count ushr 3
+              val zeroString = "00000000000000000000000000000000"//4个字节 总共32位
+              var ushrBinary = Integer.toBinaryString(ushrInt)
+              if (ushrBinary.length < 32) {
+                  ushrBinary = zeroString.substring(0, 32 - ushrBinary.length) + ushrBinary
+              }
+              for (i in id.indices) {
+                  id[i] = J1939Utils.string2byte(J1939Utils.getHex(ushrBinary.substring(i * 8, (i + 1) * 8)))
+              }
+              updateText("received -> ID[0x${DataUtils.saveHex2StringNoSpace(id)}] ${if (last == 0x04) "data[x|${DataUtils.saveHex2String(DataUtils.cutByteArray(bytes, 5, bytes.size))}]" else ""}")
+          }*/
     }
 
     private fun sendCommand(data: ByteArray) {
@@ -203,7 +203,6 @@ class J1939Activity : BaseActivity(), View.OnClickListener, TextWatcher {
 
     private fun updateText(string: String) {
         if (mTv != null) {
-            Log.e(TAG, string)
             runOnUiThread { mTv!!.append(string + "\n") }
         }
     }
