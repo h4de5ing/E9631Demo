@@ -3,12 +3,24 @@ package com.unistrong.e9631sdk;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Created by Gh0st on 2017/5/18.
+ * 自定义协议
+ * Custom protocol
+ */
 
 public class Command {
+    //协议头
     private static byte[] START = new byte[]{0x55, 0x02};
+    //协议尾
     private static byte[] ENDOF = new byte[]{0x55, 0x03};
+    //应答
+    private static byte[] ACC_OFF = new byte[]{0x31, 0x00, 0x01, 0x00};
+    private static byte[] ACC_ON = new byte[]{0x31, 0x00, 0x01, 0x01};
+    //发送
     private static byte[] VERSION = new byte[]{0x20, 0x00, 0x01, 0x33};
     private static byte[] Voltage = new byte[]{0x20, 0x00, 0x01, 0x34};
+    private static byte[] Switch125K = new byte[]{0x30, 0x00, 0x01, 0x12};
     private static byte[] Switch250K = new byte[]{0x30, 0x00, 0x01, 0x25};
     private static byte[] Switch500K = new byte[]{0x30, 0x00, 0x01, 0x50};
     private static byte[] UartBaudRate9600 = {0x30, 0x00, 0x01, 0x09};
@@ -18,7 +30,14 @@ public class Command {
     private static byte[] UartBaudRate230400 = {0x30, 0x00, 0x01, 0x23};
     private static byte[] CancelShutDown = {0x30, 0x00, 0x01, 0x02};
     private static byte[] ShutDown = {0x30, 0x00, 0x01, 0x03};
-    //private static byte[] update = new byte[]{0x30, 0x00, 0x01, 0x04};
+    private static byte[] update = new byte[]{0x30, 0x00, 0x01, 0x04};
+    private static byte[] filterCan = new byte[]{0x50, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00};
+    private static byte[] clearFilterCan = new byte[]{0x51, 0x00, 0x01, 0x00};
+
+    private static byte[] UartBaudRate460800 = {0x30, 0x00, 0x01, 0x46};
+    private static byte[] UartBaudRate500000 = {0x30, 0x00, 0x01, 0x51};
+    private static byte[] UartBaudRate576000 = {0x30, 0x00, 0x01, 0x58};
+    private static byte[] UartBaudRate921600 = {0x30, 0x00, 0x01, (byte) (0x92 & 0xff)};//将有符号byte转成无符号byte
 
     private static byte[] modeJ1939 = {(byte) 0x80, 0x00, 0x01, 0x01};
     private static byte[] modeObd = {(byte) 0x80, 0x00, 0x01, 0x02};
@@ -28,6 +47,16 @@ public class Command {
     private static byte[] channelSearch = {(byte) 0x82, 0x00, 0x01, 0x00};
     private static byte[] channel1 = {(byte) 0x82, 0x00, 0x01, 0x01};
     private static byte[] channel2 = {(byte) 0x82, 0x00, 0x01, 0x02};
+
+    protected static class Answer {
+        protected static byte[] ACC_ON() {
+            return createProtocolPacket(ACC_ON);
+        }
+
+        protected static byte[] ACC_OFF() {
+            return createProtocolPacket(ACC_OFF);
+        }
+    }
 
     public static class SendDataType {
         //protected static byte UCarTxRx = 0x10;
@@ -61,12 +90,29 @@ public class Command {
             return list;
         }
 
+        public static byte[] filterCan(byte[] id) {
+            byte[] protocolData = new byte[id.length + 3];//协议数据类型 1 + 当前长度 2 + 数据长度
+            protocolData[0] = 0x50;
+            protocolData[1] = (byte) (id.length >> 8 & 0xFF);
+            protocolData[2] = (byte) (id.length & 0xFF);
+            System.arraycopy(id, 0, protocolData, 3, id.length);
+            return createProtocolPacket(protocolData);
+        }
+
+        public static byte[] cancelFilterCan() {
+            return createProtocolPacket(new byte[]{0x51, 0x00, 0x01, 0x01});
+        }
+
         public static byte[] GpioRadar() {
             return createProtocolPacket(new byte[]{(byte) 0x90, 0x00, 0x01, 0x12});
         }
 
         public static byte[] GpioMileage() {
             return createProtocolPacket(new byte[]{(byte) 0x90, 0x00, 0x01, 0x22});
+        }
+
+        public static byte[] GpioMCUInput() {
+            return createProtocolPacket(new byte[]{(byte) 0x90, 0x00, 0x01, 0x44});//9638 MCU input
         }
 
         public static List<String> GpioName() {
@@ -80,6 +126,7 @@ public class Command {
             list.add("MCUIN2(GPIO) 线接入12V电源电压");
             list.add("Mileage_pwr_en(GPIO)");
             list.add("Mileage_mcuin(GPIO) 线接入12V电源电压");
+            list.add("MCU input 线接入12V电源电压");
             return list;
         }
 
@@ -114,19 +161,22 @@ public class Command {
         public static byte[] Switch250K() {
             return createProtocolPacket(Switch250K);
         }
+        public static byte[] Switch125K() {
+            return createProtocolPacket(Switch125K);
+        }
 
         public static byte[] Version() {
             return createProtocolPacket(VERSION);
         }
 
-        //private static byte[] Update() { return createProtocolPacket(update);}
+        private static byte[] Update() {
+            return createProtocolPacket(update);
+        }
 
         public static byte[] Voltage() {
             return createProtocolPacket(Voltage);
         }
 
-
-        @Deprecated
         private static byte[] CancelShutDown() {
             return createProtocolPacket(CancelShutDown);
         }
@@ -136,7 +186,7 @@ public class Command {
         }
 
         public static byte[] sendData(byte[] data, byte type) {
-            byte[] protocolData = new byte[data.length + 3];
+            byte[] protocolData = new byte[data.length + 3];//协议数据类型 1 + 当前长度 2 + 数据长度
             protocolData[0] = type;
             protocolData[1] = (byte) (data.length >> 8 & 0xFF);
             protocolData[2] = (byte) (data.length & 0xFF);

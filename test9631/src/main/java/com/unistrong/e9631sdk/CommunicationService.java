@@ -239,6 +239,8 @@ public class CommunicationService {
         } else if (type == 0x30 && dataType == 0x00) {//acc off
             FileUtils.saveDataInfo2File("accoff", new SimpleDateFormat("yyyyMMddHHmmss", Locale.CHINA).format(SystemClock.currentThreadTimeMillis()) + "" + saveHex2String(data));
             mIProcessData.process(data, DataType.TAccOff);
+        } else if (type == 0x31 && dataType == 0x12) {//can 125
+            mIProcessData.process(data, DataType.TCan125);
         } else if (type == 0x31 && dataType == 0x25) {//can 250
             mIProcessData.process(data, DataType.TCan250);
         } else if (type == 0x31 && dataType == 0x50) {//can 500

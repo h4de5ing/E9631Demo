@@ -127,6 +127,7 @@ class CanActivity : BaseActivity() {
                 when (position) {
                     0 -> write2Activity(Command.Send.Switch500K())
                     1 -> write2Activity(Command.Send.Switch250K())
+                    2 -> write2Activity(Command.Send.Switch125K())
                 }
             }
         }
@@ -300,6 +301,7 @@ class CanActivity : BaseActivity() {
                 }
                 DataType.TChannel -> updateReceived2UI(" channel ${J1939Utils.byte2String(data[0])}")
                 DataType.TDataMode -> updateReceived2UI(" dataMode ${getMode(data[0])}")
+                DataType.TCan125 -> updateReceived2UI(" set can 125k success")
                 DataType.TCan250 -> updateReceived2UI(" set can 250k success")
                 DataType.TCan500 -> updateReceived2UI(" set can 500k success")
                 DataType.TMcuVersion -> updateReceived2UI(" Mcu Version: ${String(data, Charset.defaultCharset())}")

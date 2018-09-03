@@ -11,6 +11,7 @@
     <string-array name="can_baud">
         <item>500 kBit/s</item>
         <item>250 kBit/s</item>
+        <item>125 kBit/s</item>
     </string-array>
     <string-array name="can_channel">
         <item>channel 1</item>
