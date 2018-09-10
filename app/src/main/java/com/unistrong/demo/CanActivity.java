@@ -269,7 +269,7 @@ public class CanActivity extends BaseActivity implements View.OnClickListener {
                 String strFilterID = etId.getText().toString().trim().toUpperCase();
                 byte[] id = strFilterID.getBytes();
                 //bytes[0] is id format
-                //sendCommand(Command.Send.filterCan(frameFormat, frameType, id));
+                sendCommand(Command.Send.filterCan(frameFormat, frameType, id));
                 filterStr = strFilterID;
                 break;
             case R.id.btn_filter_cancel:
