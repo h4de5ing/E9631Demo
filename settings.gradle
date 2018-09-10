@@ -1,2 +1,3 @@
 include ':app',':uartsdk'
-include 'test9631'
+include ':test9631'
+include ':e9631sdk'

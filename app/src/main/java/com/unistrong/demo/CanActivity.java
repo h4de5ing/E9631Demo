@@ -8,9 +8,8 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.unistrong.demo.utils.J1939Utils;
+import com.unistrong.demo.utils.KtUtils;
 import com.unistrong.e9631sdk.Command;
 import com.unistrong.e9631sdk.CommunicationService;
 import com.unistrong.e9631sdk.DataType;
@@ -90,7 +89,7 @@ public class CanActivity extends BaseActivity implements View.OnClickListener {
             mService.getData(new CommunicationService.IProcessData() {
                 @Override
                 public void process(byte[] bytes, DataType dataType) {
-                    Log.e(TAG, dataType.name() + " " + DataUtils.saveHex2String(bytes));
+                    Log.e(TAG, dataType.name() + " -> " + DataUtils.saveHex2String(bytes));
                     switch (dataType) {
                         case TAccOn:
                             break;
@@ -127,7 +126,7 @@ public class CanActivity extends BaseActivity implements View.OnClickListener {
                         case TGPIO:
                             break;
                         case TFilter:
-                            updateText((frameFormat == 0 ? "standard id" : "extend id") + " filter " + (bytes[0] > 0 ? "success " + J1939Utils.byte2int(bytes[0]) : " failed"));////bytes[0] 表示过滤的个数
+                            updateText((frameFormat == 0 ? "standard id" : "extend id") + " filter " + (bytes[0] == 0x01 ? "success" : " failed"));
                             break;
                         case TCancelFilter:
                             updateText("can id cancel filter " + (bytes[0] == 0x01 ? "success" : " failed"));
@@ -140,15 +139,43 @@ public class CanActivity extends BaseActivity implements View.OnClickListener {
         }
     }
 
-    private void handleCanData(byte[] data) {
-        switch (data[0]) {
-            case 0x01:
-                updateText("we got can channel 1 data:" + DataUtils.saveHex2String(data));
+    private void handleCanData(byte[] bytes) {
+        byte[] id = new byte[4];
+        System.arraycopy(bytes, 1, id, 0, id.length);//ID
+        byte[] data = null;
+        int frameFormatType = (id[3] & 7);
+        int frameFormat = 0;
+        int frameType = 0;
+        byte[] newId = null;
+        switch (frameFormatType) {
+            case 0://standard  data
+                frameFormat = 0;
+                frameType = 0;
+                newId = new KtUtils().ushr3(id, 21);
+                int dataLength = bytes[5];
+                data = new byte[dataLength];
+                System.arraycopy(bytes, 6, data, 0, dataLength);
                 break;
-            case 0x02:
-                updateText("we got can channel 2 data:" + DataUtils.saveHex2String(data));
+            case 2://standard remote
+                frameFormat = 0;
+                frameType = 1;
+                newId = new KtUtils().ushr3(id, 21);
+                break;
+            case 4://extend data
+                frameFormat = 1;
+                frameType = 0;
+                newId = new KtUtils().ushr3(id, 3);
+                int dataLengthExtra = bytes[5];
+                data = new byte[dataLengthExtra];
+                System.arraycopy(bytes, 6, data, 0, dataLengthExtra);
+                break;
+            case 6://extend remote
+                frameFormat = 1;
+                frameType = 1;
+                newId = new KtUtils().ushr3(id, 3);
                 break;
         }
+        updateText("channel [" + bytes[0] + "]," + (frameFormat == 0 ? "standard" : "extend") + " " + (frameType == 0 ? "data" : "remote") + " id:[0x" + saveHex2String(newId) + "]" + (data == null ? "" : "data:[0x" + saveHex2String(data) + "]"));
     }
 
     private void sendCommand(byte[] data) {
@@ -159,10 +186,10 @@ public class CanActivity extends BaseActivity implements View.OnClickListener {
         }
     }
 
-    private void sendCanData(byte[] id, byte[] data) {
+    private void sendCanData(int frameFormat, int frameType, byte[] id, byte[] data) {
         if (mService != null) {
             if (mService.isBindSuccess()) {
-                mService.sendCan(id, data);
+                mService.sendCan(frameFormat, frameType, id, data);
             }
         }
     }
@@ -211,14 +238,14 @@ public class CanActivity extends BaseActivity implements View.OnClickListener {
                 if (strID.contains("X")) {
                     etId.setError("Error id");
                 } else {
-                    if (strID.length() % 2 == 0 || strID.length() != 8) {
-                        if (strData.length() % 2 == 0 || strData.length() != 16) {
-                            testSendCanData(int2byte(strID, 4), int2byte(strData, 8));
+                    if (strID.length() == 8) {
+                        if (strData.length() > 0 && strData.length() % 2 == 0) {
+                            sendCanData(frameFormat, frameType, int2byte(strID, 4), int2byte(strData, 8));
                         } else {
-                            Toast.makeText(CanActivity.this, "error data", Toast.LENGTH_SHORT).show();
+                            etId.setError("input Correct CAN DATA ");
                         }
                     } else {
-                        Toast.makeText(CanActivity.this, "error id", Toast.LENGTH_SHORT).show();
+                        etId.setError("Id is 4 Byte");
                     }
                 }
                 break;
@@ -231,6 +258,8 @@ public class CanActivity extends BaseActivity implements View.OnClickListener {
                  0x02 标准远程帧
                  0x04 扩展数据帧
                  0x06 扩展远程帧
+
+                 0x08 表示过滤J1939协议
                  后面  发送数据 01 31 43 37 37 37 32 58 58
                  8个字节是过滤id的字符串
                  1C7772XX
@@ -239,19 +268,8 @@ public class CanActivity extends BaseActivity implements View.OnClickListener {
                  */
                 String strFilterID = etId.getText().toString().trim().toUpperCase();
                 byte[] id = strFilterID.getBytes();
-                byte[] extendid = new byte[id.length + 1];
-                System.arraycopy(id, 0, extendid, 1, id.length);
-                //extendid[0] = (byte) (frameFormat == 1 ? 0x01 : 0x00);//1 扩展 0 标准
-                if (frameFormat == 0 && frameType == 0) {//标准数据帧
-                    extendid[0] = (byte) 0x00;
-                } else if (frameFormat == 0 && frameType == 1) {//标准远程帧
-                    extendid[0] = (byte) 0x02;
-                } else if (frameFormat == 1 && frameType == 0) {//扩展数据帧
-                    extendid[0] = (byte) 0x04;
-                } else if (frameFormat == 1 && frameType == 1) {//扩展远程帧
-                    extendid[0] = (byte) 0x06;
-                }
-                sendCommand(Command.Send.filterCan(extendid));
+                //bytes[0] is id format
+                //sendCommand(Command.Send.filterCan(frameFormat, frameType, id));
                 filterStr = strFilterID;
                 break;
             case R.id.btn_filter_cancel:
@@ -261,91 +279,6 @@ public class CanActivity extends BaseActivity implements View.OnClickListener {
     }
 
     String filterStr = "";
-
-    public void testSendCanData(byte[] id, byte[] data) {
-        sendCanData(canFrame(id, frameFormat, frameType), data);
-    }
-
-    /**
-     * 设置偏移
-     *
-     * @param id
-     * @param frameFormat
-     * @param frameType
-     * @return
-     */
-    public byte[] canFrame(byte[] id, int frameFormat, int frameType) {
-        Log.i("gh0st", "" + frameFormat + " " + frameType);
-        if (frameFormat == 0) {//11位 数据帧
-            id[1] = (byte) (id[1] & 0xF0);//取前4位
-            id[2] = 0x00;
-            id[3] = 0x00;
-        } else {//扩展数据帧
-            int count = (id[0] & 0xff) << 24 | (id[1] & 0xff) << 16 | (id[2] & 0xff) << 8 | (id[3] & 0xff);
-            int shlInt = count << 3;
-            String shlBinary = Integer.toBinaryString(shlInt);
-            String zeroString = "00000000000000000000000000000000";
-            if (shlBinary.length() < 32) {
-                shlBinary = zeroString.substring(0, 32 - shlBinary.length()) + shlBinary;
-            }
-            for (int i = 0; i < id.length; i++) {
-                id[i] = string2byte(getHex(shlBinary.substring(i * 8, (i + 1) * 8)));
-            }
-        }
-        if (frameFormat == 0 && frameType == 0) {//标准数据帧
-            //newId[3] = (byte) (newId[3]);
-        } else if (frameFormat == 0 && frameType == 1) {//标准远程帧
-            id[3] = (byte) (id[3] | 0x02);
-        } else if (frameFormat == 1 && frameType == 0) {//扩展数据帧
-            id[3] = (byte) (id[3] | 0x04);
-        } else if (frameFormat == 1 && frameType == 1) {//扩展远程帧 输入值左移3位 然后 & 000类型
-            id[3] = (byte) (id[3] | 0x06);
-        }
-        return id;
-    }
-
-    public static byte string2byte(String byteString) {
-        byte b = 0;
-        if (byteString.length() == 2) {
-            b = (byte) (Integer.valueOf(byteString.substring(0, 2), 16) & 0xff);
-        }
-        return b;
-    }
-
-    public static String getHex(String binary) {
-        StringBuilder sb = new StringBuilder();
-        int digitNumber = 1;
-        int sum = 0;
-        for (int i = 0; i < binary.length(); i++) {
-            if (digitNumber == 1)
-                sum += Integer.parseInt(binary.charAt(i) + "") * 8;
-            else if (digitNumber == 2)
-                sum += Integer.parseInt(binary.charAt(i) + "") * 4;
-            else if (digitNumber == 3)
-                sum += Integer.parseInt(binary.charAt(i) + "") * 2;
-            else if (digitNumber == 4 || i < binary.length() + 1) {
-                sum += Integer.parseInt(binary.charAt(i) + "") * 1;
-                digitNumber = 0;
-                if (sum < 10)
-                    sb.append(sum);
-                else if (sum == 10)
-                    sb.append("A");
-                else if (sum == 11)
-                    sb.append("B");
-                else if (sum == 12)
-                    sb.append("C");
-                else if (sum == 13)
-                    sb.append("D");
-                else if (sum == 14)
-                    sb.append("E");
-                else if (sum == 15)
-                    sb.append("F");
-                sum = 0;
-            }
-            digitNumber++;
-        }
-        return sb.toString();
-    }
 
     public byte[] int2byte(String string, int byteLength) {
         byte[] data = new byte[byteLength];
@@ -369,8 +302,7 @@ public class CanActivity extends BaseActivity implements View.OnClickListener {
 
     public static String saveHex2String(byte[] data) {
         StringBuilder sb = new StringBuilder(data.length * 2);
-        final char[] HEX = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-                'A', 'B', 'C', 'D', 'E', 'F'};
+        final char[] HEX = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
         for (int i = 0; i < data.length; i++) {
             int value = data[i] & 0xff;
             sb.append(HEX[value / 16]).append(HEX[value % 16]).append(" ");
