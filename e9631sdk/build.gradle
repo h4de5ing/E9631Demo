@@ -35,7 +35,7 @@ task makeJarOne(type: Copy) {
     //（我们只关心classes.jar这个文件）
     include('classes.jar')
     //重命名
-    rename('classes.jar', 'e9631_can_sdk_v1.6.jar')
+    rename('classes.jar', 'e9631_can_sdk_v1.7.jar')
 
     //from('build/libs/e9631_sdk.jar')
     //into('../e9631j/libs/')//拷贝到 E9631 目录下面

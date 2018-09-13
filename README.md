@@ -261,6 +261,9 @@ e9631_can_sdk_v1.4.jar
  e9631_can_sdk_v1.6.jar
 1.optimization can id   -> last MCU version 2.17
 
+e9631_can_sdk_v1.7.jar
+1.optimization postData2()   -> last MCU version 2.17
+
 app log
 1.7 ->  last MCU version 2.12
  can id filter
